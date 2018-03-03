@@ -1,0 +1,27 @@
+description = 'klibreddit-sample'
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'application'
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.6'
+}
+
+mainClassName = 'org.jraf.klibreddit.sample.SampleKt'
+
+dependencies {
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+
+    // Rx
+    implementation "io.reactivex.rxjava2:rxkotlin:$versions.rxKotlin"
+
+    // Slf4j
+    implementation "org.slf4j:slf4j-simple:$versions.slf4j"
+
+    // Core
+    implementation project(':core')
+}
+
+// Use "./gradlew run" to run the sample

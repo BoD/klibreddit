@@ -1,0 +1,67 @@
+ext.globalProjectName = 'klibreddit'
+
+buildscript {
+    // Versions used across modules
+    ext.versions = [:]
+    ext.versions.with {
+        gradleVersionsPlugin = '0.17.0'
+
+        kotlin = '1.2.30'
+        rxJava = '2.1.7'
+        rxKotlin = '2.2.0'
+        okHttp = '3.9.0'
+        libFrc = '1.8.0'
+        twitter4j = '4.0.6'
+        forecastIo = '1.6.0'
+        sunriseSunset = '1.1.1'
+        klaxon = '2.1.2'
+        json = '20171018'
+        slf4j = '1.7.25'
+    }
+
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+        classpath "com.github.ben-manes:gradle-versions-plugin:$versions.gradleVersionsPlugin"
+    }
+}
+
+allprojects {
+    group = 'org.jraf'
+    version = '1.0.0'
+
+    repositories {
+        mavenLocal()
+        google()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.6'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+// Run './gradlew dependencyUpdates' to see new versions of dependencies
+apply plugin: 'com.github.ben-manes.versions'
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { selection ->
+            boolean rejected = ['alpha', 'beta', 'rc'].any { qualifier ->
+                selection.candidate.version.toLowerCase() ==~ /.*-${qualifier}.*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
+            }
+        }
+    }
+}
