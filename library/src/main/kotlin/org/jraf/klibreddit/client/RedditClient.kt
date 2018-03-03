@@ -23,27 +23,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.core
+package org.jraf.klibreddit.client
 
-import org.jraf.klibreddit.core.model.client.ClientConfiguration
-import org.jraf.klibreddit.core.model.oauth.OAuthScope
-import org.jraf.klibreddit.util.StringUtil.toUrlEncoded
-import java.util.Locale
-import java.util.UUID
+import io.reactivex.Single
+import org.jraf.klibreddit.internal.client.RedditClientImpl
+import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.oauth.OAuthScope
 
-class RedditClient(
-    private val clientConfiguration: ClientConfiguration
-) {
+interface RedditClient {
+    fun getAuthorizeUrl(vararg scopes: OAuthScope): String
+    fun onAuthorizeRedirect(authorizeRedirectUri: String): Single<String>
+    fun setRefreshToken(refreshToken: String)
+
     companion object {
-        private const val URL_AUTHORIZE =
-            "https://www.reddit.com/api/v1/authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
+        fun newRedditClient(configuration: ClientConfiguration): RedditClient = RedditClientImpl(configuration)
     }
-
-    fun getAuthorizeUrl(vararg scopes: OAuthScope) = URL_AUTHORIZE.format(
-        Locale.US,
-        clientConfiguration.oAuthConfiguration.clientId.toUrlEncoded(),
-        UUID.randomUUID().toString().toUrlEncoded(),
-        clientConfiguration.oAuthConfiguration.redirectUri.toUrlEncoded(),
-        scopes.joinToString(",") { it.name.toLowerCase(Locale.US) }.toUrlEncoded()
-    )
 }

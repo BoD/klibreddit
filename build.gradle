@@ -9,6 +9,7 @@ buildscript {
         kotlin = '1.2.30'
         rxJava = '2.1.7'
         rxKotlin = '2.2.0'
+        junit = '4.12'
         okHttp = '3.9.0'
         libFrc = '1.8.0'
         twitter4j = '4.0.6'
@@ -17,6 +18,8 @@ buildscript {
         klaxon = '2.1.2'
         json = '20171018'
         slf4j = '1.7.25'
+        retrofit = '2.3.0'
+        moshi = '1.5.0'
     }
 
     repositories {

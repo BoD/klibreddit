@@ -23,40 +23,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.core.model.oauth
+package org.jraf.klibreddit.internal.client
 
-/**
- * Available scopes granting accesses to the different APIs.
- *
- * List obtained via [https://www.reddit.com/api/v1/scopes].
- */
-enum class OAuthScope {
-    CREDDITS,
-    MODCONTRIBUTORS,
-    MODMAIL,
-    MODCONFIG,
-    SUBSCRIBE,
-    STRUCTUREDSTYLES,
-    VOTE,
-    WIKIEDIT,
-    MYSUBREDDITS,
-    SUBMIT,
-    MODLOG,
-    MODPOSTS,
-    MODFLAIR,
-    SAVE,
-    MODOTHERS,
-    READ,
-    PRIVATEMESSAGES,
-    REPORT,
-    IDENTITY,
-    LIVEMANAGE,
-    ACCOUNT,
-    MODTRAFFIC,
-    WIKIREAD,
-    EDIT,
-    MODWIKI,
-    MODSELF,
-    HISTORY,
-    FLAIR,
+import java.util.Date
+import java.util.concurrent.TimeUnit
+
+internal data class OAuthTokens(
+    var accessToken: String? = null,
+    var accessTokenExpirationDate: Date? = null,
+    var refreshToken: String
+) {
+    val needsRefresh: Boolean
+        get() {
+            var accessTokenExpirationDate = accessTokenExpirationDate
+            if (accessToken == null || accessTokenExpirationDate == null) return true
+            // Add one minute to account for imprecision
+            accessTokenExpirationDate = Date(
+                accessTokenExpirationDate.time + TimeUnit.MINUTES.toMillis(1)
+            )
+            return accessTokenExpirationDate.after(Date())
+        }
 }

@@ -1,4 +1,4 @@
-description = 'klibreddit-core'
+description = 'klibreddit-library'
 
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
@@ -44,6 +44,15 @@ dependencies {
 
     // Json
     implementation "org.json:json:$versions.json"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+
+    // Moshi
+    implementation "com.squareup.moshi:moshi-kotlin:$versions.moshi"
+
 }
 
 // Use "./gradlew publishToMavenLocal" to deploy the artifacts to your local maven repository

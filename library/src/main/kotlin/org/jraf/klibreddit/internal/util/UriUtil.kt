@@ -23,11 +23,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.core.model.client
+package org.jraf.klibreddit.internal.util
 
-import org.jraf.klibreddit.core.model.oauth.OAuthConfiguration
+import java.net.URI
 
-data class ClientConfiguration(
-    val userAgent: UserAgent,
-    val oAuthConfiguration: OAuthConfiguration
-)
+object UriUtil {
+    val URI.queryParams
+        get() = query.split('&').map {
+            it.split('=').let { parts ->
+                parts[0] to parts[1]
+            }
+        }.associateBy({ it.first }, { it.second })
+}

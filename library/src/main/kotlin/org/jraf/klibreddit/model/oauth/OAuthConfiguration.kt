@@ -23,7 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.core.model.oauth
+package org.jraf.klibreddit.model.oauth
 
 data class OAuthConfiguration(
     val clientId: String,

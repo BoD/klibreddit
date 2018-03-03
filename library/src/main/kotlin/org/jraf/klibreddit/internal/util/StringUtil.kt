@@ -23,18 +23,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.core.model.client
+package org.jraf.klibreddit.internal.util
 
-/**
- * The string that will be used in the User-Agent header of all requests.
- *
- * See [https://github.com/reddit-archive/reddit/wiki/API#rules]
- *
- * @param redditUserName Reddit user name for contact information. Do not prefix with `/u/`.
- */
-data class UserAgent(
-    val platform: String,
-    val appId: String,
-    val version: String,
-    val redditUserName: String
-)
+import java.net.URLEncoder
+
+object StringUtil {
+    fun String.toUrlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8.name())
+}

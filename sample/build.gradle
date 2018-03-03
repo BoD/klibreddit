@@ -20,8 +20,8 @@ dependencies {
     // Slf4j
     implementation "org.slf4j:slf4j-simple:$versions.slf4j"
 
-    // Core
-    implementation project(':core')
+    // Library
+    implementation project(':library')
 }
 
 // Use "./gradlew run" to run the sample
