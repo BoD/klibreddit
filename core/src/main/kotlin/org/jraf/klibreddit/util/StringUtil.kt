@@ -23,30 +23,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.sample
+package org.jraf.klibreddit.util
 
-import org.jraf.klibreddit.core.RedditClient
-import org.jraf.klibreddit.core.model.client.ClientConfiguration
-import org.jraf.klibreddit.core.model.client.UserAgent
-import org.jraf.klibreddit.core.model.oauth.OAuthConfiguration
-import org.jraf.klibreddit.core.model.oauth.OAuthScope
+import java.net.URLEncoder
 
-const val PLATFORM = "cli"
-const val APP_ID = "klibreddit-sample"
-const val VERSION = "1.0.0"
-const val AUTHOR_REDDIT_NAME = "bodlulu"
-
-fun main(av: Array<String>) {
-    val client = RedditClient(
-        ClientConfiguration(
-            UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
-            OAuthConfiguration(
-                System.getenv("OAUTH_CLIENT_ID"),
-                System.getenv("OAUTH_REDIRECT_URI")
-            )
-        )
-    )
-
-    println(client.getAuthorizeUrl(*OAuthScope.values()))
+object StringUtil {
+    fun String.toUrlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8.name())
 }
-
