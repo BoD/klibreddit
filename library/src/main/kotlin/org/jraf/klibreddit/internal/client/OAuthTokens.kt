@@ -37,10 +37,10 @@ internal data class OAuthTokens(
         get() {
             var accessTokenExpirationDate = accessTokenExpirationDate
             if (accessToken == null || accessTokenExpirationDate == null) return true
-            // Add one minute to account for imprecision
+            // Subtract one minute to account for imprecision
             accessTokenExpirationDate = Date(
-                accessTokenExpirationDate.time + TimeUnit.MINUTES.toMillis(1)
+                accessTokenExpirationDate.time - TimeUnit.MINUTES.toMillis(1)
             )
-            return accessTokenExpirationDate.after(Date())
+            return Date().after(accessTokenExpirationDate)
         }
 }

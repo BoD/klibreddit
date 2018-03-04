@@ -27,6 +27,7 @@ package org.jraf.klibreddit.internal.client
 
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
+import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.Credentials
 import org.jraf.klibreddit.client.RedditClient
@@ -57,7 +58,8 @@ internal class RedditClientImpl(
             "${URL_BASE_API}authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
 
         private const val AUTHORIZE_REDIRECT_PARAM_CODE = "code"
-        private const val AUTHORIZE_GRANT_TYPE = "authorization_code"
+        private const val GRANT_TYPE_AUTHORIZE = "authorization_code"
+        private const val GRANT_REFRESH_TOKEN = "refresh_token"
     }
 
     private var oAuthTokens: OAuthTokens? = null
@@ -94,7 +96,7 @@ internal class RedditClientImpl(
                 ?: throw IllegalArgumentException("Invalid format for authorizeRedirectUri")
 
         return service.accessToken(
-            grantType = AUTHORIZE_GRANT_TYPE,
+            grantType = GRANT_TYPE_AUTHORIZE,
             code = code,
             redirectUri = clientConfiguration.oAuthConfiguration.redirectUri,
             authorizationHeader = Credentials.basic(clientConfiguration.oAuthConfiguration.clientId, "")
@@ -103,18 +105,43 @@ internal class RedditClientImpl(
                 oAuthTokens = OAuthTokens(
                     it.access_token,
                     Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(it.expires_in.toLong())),
-                    it.refresh_token
+                    it.refresh_token!!
                 )
             }
             .map { it.refresh_token }
+    }
+
+    override fun refreshAuthToken(): Single<String> {
+        return service.refreshToken(
+            grantType = GRANT_REFRESH_TOKEN,
+            refreshToken = oAuthTokens!!.refreshToken,
+            authorizationHeader = Credentials.basic(clientConfiguration.oAuthConfiguration.clientId, "")
+        )
+            .doOnSuccess {
+                oAuthTokens = OAuthTokens(
+                    it.access_token,
+                    Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(it.expires_in.toLong())),
+                    oAuthTokens!!.refreshToken
+                )
+            }
+            .map { it.access_token }
     }
 
     override fun setRefreshToken(refreshToken: String) {
         oAuthTokens = OAuthTokens(refreshToken = refreshToken)
     }
 
+    private fun ensureAuthToken(): Completable {
+        return if (oAuthTokens!!.needsRefresh) {
+            refreshAuthToken().toCompletable()
+        } else {
+            Completable.complete()
+        }
+    }
+
     override fun me(): Single<Me> {
-        return service.me()
+        return ensureAuthToken()
+            .andThen(service.me())
             .map(Me.Companion::fromApi)
     }
 }

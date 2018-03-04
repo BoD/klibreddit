@@ -49,6 +49,15 @@ internal interface RedditService {
         @Header("Authorization") authorizationHeader: String
     ): Single<ApiAccessTokenResult>
 
+    @POST("${URL_BASE_API}access_token")
+    @FormUrlEncoded
+    fun refreshToken(
+        @Field("grant_type") grantType: String,
+        @Field("refresh_token") refreshToken: String,
+        @Header("Authorization") authorizationHeader: String
+    ): Single<ApiAccessTokenResult>
+
+
     @GET("me")
     fun me(): Single<ApiMe>
 }

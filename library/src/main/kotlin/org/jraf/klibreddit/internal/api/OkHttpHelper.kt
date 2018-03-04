@@ -25,12 +25,18 @@
 
 package org.jraf.klibreddit.internal.api
 
+import io.reactivex.Single
+import okhttp3.Authenticator
 import okhttp3.OkHttpClient
 import org.jraf.klibreddit.model.client.UserAgent
 import java.net.InetSocketAddress
 import java.net.Proxy
 
 object OkHttpHelper {
+    private const val HEADER_USER_AGENT = "User-Agent"
+    private const val HEADER_AUTHORIZATION = "Authorization"
+    private const val BEARER = "bearer"
+
     fun provideOkHttpClient(userAgent: UserAgent, authTokenProvider: AuthTokenProvider): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -38,11 +44,11 @@ object OkHttpHelper {
                 chain.proceed(
                     request.newBuilder().apply {
                         // Add user agent
-                        header("User-Agent", userAgent.toString())
+                        header(HEADER_USER_AGENT, userAgent.toString())
 
-                        // Auth token, if present
-                        authTokenProvider.authToken?.let { authToken ->
-                            header("Authorization", "bearer $authToken")
+                        if (request.header(HEADER_AUTHORIZATION) == null) {
+                            // Auth token, if present
+                            header(HEADER_AUTHORIZATION, "$BEARER ${authTokenProvider.authToken ?: "-"}")
                         }
 
                         // Ask for raw json
@@ -51,11 +57,21 @@ object OkHttpHelper {
                         .build()
                 )
             }
+            .authenticator(Authenticator { route, response ->
+                val request = response.request()
+                val newAuthToken = authTokenProvider.refreshAuthToken()
+                    .blockingGet()
+                request.newBuilder()
+                    .header(HEADER_AUTHORIZATION, "$BEARER $newAuthToken")
+                    .build()
+            })
             .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 8888)))
             .build()
     }
 
     interface AuthTokenProvider {
         val authToken: String?
+        fun refreshAuthToken(): Single<String>
     }
+
 }

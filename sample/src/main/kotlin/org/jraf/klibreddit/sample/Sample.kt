@@ -47,9 +47,12 @@ fun main(av: Array<String>) {
     )
 
 //    println(client.getAuthorizeUrl(*OAuthScope.values()))
+//    client.onAuthorizeRedirect("http://jraf.org/klibreddit?state=51ebeff1-0594-4fc6-ae33-85c8c11e71f1&code=SqC7DlgeE75v49-YqukUjHKTbJQ")
+//        .flatMap { client.me() }
 
-    client.onAuthorizeRedirect("http://jraf.org/klibreddit?state=51ebeff1-0594-4fc6-ae33-85c8c11e71f1&code=SqC7DlgeE75v49-YqukUjHKTbJQ")
-        .flatMap { client.me() }
+
+    client.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
+    client.me()
         .subscribe { it -> println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 }
 
