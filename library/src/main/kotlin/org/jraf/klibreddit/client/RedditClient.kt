@@ -27,15 +27,18 @@ package org.jraf.klibreddit.client
 
 import io.reactivex.Single
 import org.jraf.klibreddit.internal.client.RedditClientImpl
+import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.oauth.OAuthScope
 
 interface RedditClient {
+    companion object {
+        fun newRedditClient(configuration: ClientConfiguration): RedditClient = RedditClientImpl(configuration)
+    }
+
     fun getAuthorizeUrl(vararg scopes: OAuthScope): String
     fun onAuthorizeRedirect(authorizeRedirectUri: String): Single<String>
     fun setRefreshToken(refreshToken: String)
 
-    companion object {
-        fun newRedditClient(configuration: ClientConfiguration): RedditClient = RedditClientImpl(configuration)
-    }
+    fun me(): Single<Me>
 }

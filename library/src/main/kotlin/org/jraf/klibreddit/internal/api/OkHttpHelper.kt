@@ -30,18 +30,32 @@ import org.jraf.klibreddit.model.client.UserAgent
 import java.net.InetSocketAddress
 import java.net.Proxy
 
-
 object OkHttpHelper {
-    fun provideOkHttpClient(userAgent: UserAgent): OkHttpClient {
+    fun provideOkHttpClient(userAgent: UserAgent, authTokenProvider: AuthTokenProvider): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
+                val request = chain.request()
                 chain.proceed(
-                    chain.request().newBuilder()
-                        .header("User-Agent", userAgent.toString())
+                    request.newBuilder().apply {
+                        // Add user agent
+                        header("User-Agent", userAgent.toString())
+
+                        // Auth token, if present
+                        authTokenProvider.authToken?.let { authToken ->
+                            header("Authorization", "bearer $authToken")
+                        }
+
+                        // Ask for raw json
+                        url(request.url().newBuilder().addQueryParameter("raw_json", "1").build())
+                    }
                         .build()
                 )
             }
             .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 8888)))
             .build()
+    }
+
+    interface AuthTokenProvider {
+        val authToken: String?
     }
 }

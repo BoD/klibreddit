@@ -32,8 +32,11 @@ import okhttp3.Credentials
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.internal.api.OkHttpHelper
 import org.jraf.klibreddit.internal.api.RedditService
+import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API
+import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_OAUTH
 import org.jraf.klibreddit.internal.util.StringUtil.toUrlEncoded
 import org.jraf.klibreddit.internal.util.UriUtil.queryParams
+import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.oauth.OAuthScope
 import retrofit2.Retrofit
@@ -47,13 +50,11 @@ import java.util.concurrent.TimeUnit
 
 internal class RedditClientImpl(
     private val clientConfiguration: ClientConfiguration
-) : RedditClient {
+) : RedditClient, OkHttpHelper.AuthTokenProvider {
 
     companion object {
-        private const val API_BASE = "https://api.reddit.com/api/v1/"
-
         private const val URL_AUTHORIZE =
-            "${API_BASE}authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
+            "${URL_BASE_API}authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
 
         private const val AUTHORIZE_REDIRECT_PARAM_CODE = "code"
         private const val AUTHORIZE_GRANT_TYPE = "authorization_code"
@@ -61,9 +62,12 @@ internal class RedditClientImpl(
 
     private var oAuthTokens: OAuthTokens? = null
 
+    override val authToken: String?
+        get() = oAuthTokens?.accessToken
+
     private val service: RedditService by lazy {
         Retrofit.Builder()
-            .baseUrl(API_BASE)
+            .baseUrl(URL_BASE_OAUTH)
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(
                 MoshiConverterFactory.create(
@@ -72,7 +76,7 @@ internal class RedditClientImpl(
                         .build()
                 )
             )
-            .client(OkHttpHelper.provideOkHttpClient(clientConfiguration.userAgent))
+            .client(OkHttpHelper.provideOkHttpClient(clientConfiguration.userAgent, this))
             .build()
             .create(RedditService::class.java)
     }
@@ -107,5 +111,10 @@ internal class RedditClientImpl(
 
     override fun setRefreshToken(refreshToken: String) {
         oAuthTokens = OAuthTokens(refreshToken = refreshToken)
+    }
+
+    override fun me(): Single<Me> {
+        return service.me()
+            .map(Me.Companion::fromApi)
     }
 }

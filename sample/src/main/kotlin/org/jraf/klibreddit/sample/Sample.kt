@@ -29,7 +29,6 @@ import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
-import org.jraf.klibreddit.model.oauth.OAuthScope
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
@@ -47,8 +46,10 @@ fun main(av: Array<String>) {
         )
     )
 
-    println(client.getAuthorizeUrl(*OAuthScope.values()))
+//    println(client.getAuthorizeUrl(*OAuthScope.values()))
 
-    client.onAuthorizeRedirect("http://jraf.org/klibreddit?state=73638fc0-c08f-4799-976b-4493bf6528e7&code=6Bv3q2cvhJVWrfM2cbFSk0-AEnM")
+    client.onAuthorizeRedirect("http://jraf.org/klibreddit?state=51ebeff1-0594-4fc6-ae33-85c8c11e71f1&code=SqC7DlgeE75v49-YqukUjHKTbJQ")
+        .flatMap { client.me() }
+        .subscribe { it -> println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 }
 
