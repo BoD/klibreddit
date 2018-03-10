@@ -27,7 +27,7 @@ package org.jraf.klibreddit.internal.api
 
 import io.reactivex.Single
 import org.jraf.klibreddit.internal.api.model.ApiAccessTokenResult
-import org.jraf.klibreddit.internal.api.model.ApiMe
+import org.jraf.klibreddit.internal.api.model.account.ApiMe
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET

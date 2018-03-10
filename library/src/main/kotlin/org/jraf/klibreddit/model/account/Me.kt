@@ -25,9 +25,7 @@
 
 package org.jraf.klibreddit.model.account
 
-import org.jraf.klibreddit.internal.api.model.ApiMe
 import java.util.Date
-import java.util.concurrent.TimeUnit
 
 data class Me(
     val isEmployee: Boolean,
@@ -55,34 +53,4 @@ data class Me(
     val name: String,
     val created: Date,
     val commentKarma: Int
-) {
-    companion object {
-        internal fun fromApi(apiMe: ApiMe) = Me(
-            apiMe.is_employee,
-            apiMe.has_visited_new_profile,
-            apiMe.pref_no_profanity,
-            apiMe.is_suspended,
-            apiMe.pref_geopopular,
-            apiMe.is_sponsor,
-            apiMe.id,
-            apiMe.verified,
-            apiMe.over_18,
-            apiMe.is_gold,
-            apiMe.is_mod,
-            apiMe.has_verified_email,
-            apiMe.in_redesign_beta,
-            apiMe.icon_img,
-            apiMe.has_mod_mail,
-            apiMe.oauth_client_id,
-            apiMe.hide_from_robots,
-            apiMe.link_karma,
-            apiMe.inbox_count,
-            apiMe.pref_top_karma_subreddits,
-            apiMe.has_mail,
-            apiMe.pref_show_snoovatar,
-            apiMe.name,
-            Date(TimeUnit.SECONDS.toMillis(apiMe.created_utc.toLong())),
-            apiMe.comment_karma
-        )
-    }
-}
+)

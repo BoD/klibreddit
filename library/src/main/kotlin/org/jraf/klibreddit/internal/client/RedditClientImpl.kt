@@ -142,6 +142,6 @@ internal class RedditClientImpl(
     override fun me(): Single<Me> {
         return ensureAuthToken()
             .andThen(service.me())
-            .map(Me.Companion::fromApi)
+            .map { it.toPublicModel() }
     }
 }

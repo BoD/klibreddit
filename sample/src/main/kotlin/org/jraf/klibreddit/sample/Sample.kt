@@ -25,6 +25,7 @@
 
 package org.jraf.klibreddit.sample
 
+import io.reactivex.rxkotlin.subscribeBy
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.UserAgent
@@ -53,6 +54,5 @@ fun main(av: Array<String>) {
 
     client.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
     client.me()
-        .subscribe { it -> println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 }
-
