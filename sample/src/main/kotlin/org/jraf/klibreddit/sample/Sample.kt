@@ -53,6 +53,8 @@ fun main(av: Array<String>) {
 
 
     client.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
-    client.me()
-        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+//    client.me()
+//        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+    client.best()
+        .subscribeBy { println(it) }
 }

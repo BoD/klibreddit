@@ -23,12 +23,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.api.model
+package org.jraf.klibreddit.internal.util
 
-internal data class ApiAccessTokenResult(
-    val access_token: String,
-    val refresh_token: String?,
-    val token_type: String,
-    val expires_in: Int,
-    val scope: String
-)
+import java.util.Date
+import java.util.concurrent.TimeUnit
+
+internal object DateUtil {
+    fun Double.toDate(): Date = Date(TimeUnit.SECONDS.toMillis(toLong()))
+}

@@ -25,10 +25,29 @@
 
 package org.jraf.klibreddit.internal.api.model
 
-internal data class ApiAccessTokenResult(
-    val access_token: String,
-    val refresh_token: String?,
-    val token_type: String,
-    val expires_in: Int,
-    val scope: String
-)
+import com.squareup.moshi.FromJson
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
+import com.squareup.moshi.ToJson
+import org.jraf.klibreddit.internal.util.DateUtil.toDate
+import java.util.Date
+
+internal data class DateOrNull(val date: Date?)
+
+internal class DateOrNullAdapter {
+    @FromJson
+    fun fromJson(reader: JsonReader): DateOrNull {
+        val jsonValue = reader.readJsonValue()
+        return when (jsonValue) {
+            is Boolean -> DateOrNull(null)
+            is Double -> DateOrNull(jsonValue.toDate())
+            else -> throw JsonDataException("Expected a field of type Boolean or Double")
+        }
+    }
+
+    @ToJson
+    fun toJson(writer: JsonWriter, value: DateOrNull) {
+        throw UnsupportedOperationException()
+    }
+}

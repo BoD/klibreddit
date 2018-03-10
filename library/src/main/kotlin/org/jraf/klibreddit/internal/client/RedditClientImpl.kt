@@ -25,7 +25,6 @@
 
 package org.jraf.klibreddit.internal.client
 
-import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -33,12 +32,17 @@ import okhttp3.Credentials
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.internal.api.OkHttpHelper
 import org.jraf.klibreddit.internal.api.RedditService
-import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API
+import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API_V1
 import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_OAUTH
+import org.jraf.klibreddit.internal.api.model.DateOrNullAdapter
+import org.jraf.klibreddit.internal.api.model.account.ApiMeConverter
+import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
 import org.jraf.klibreddit.internal.util.StringUtil.toUrlEncoded
 import org.jraf.klibreddit.internal.util.UriUtil.queryParams
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.listings.Page
+import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.oauth.OAuthScope
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -55,7 +59,7 @@ internal class RedditClientImpl(
 
     companion object {
         private const val URL_AUTHORIZE =
-            "${URL_BASE_API}authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
+            "${URL_BASE_API_V1}authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
 
         private const val AUTHORIZE_REDIRECT_PARAM_CODE = "code"
         private const val GRANT_TYPE_AUTHORIZE = "authorization_code"
@@ -74,7 +78,9 @@ internal class RedditClientImpl(
             .addConverterFactory(
                 MoshiConverterFactory.create(
                     Moshi.Builder()
-                        .add(KotlinJsonAdapterFactory())
+//                        .add(KotlinJsonAdapterFactory())
+//                        .add(ApplicationJsonAdapterFactory.INSTANCE)
+                        .add(DateOrNullAdapter())
                         .build()
                 )
             )
@@ -139,9 +145,16 @@ internal class RedditClientImpl(
         }
     }
 
+    private fun <T> call(call: Single<T>): Single<T> = ensureAuthToken().andThen(call)
+
     override fun me(): Single<Me> {
-        return ensureAuthToken()
-            .andThen(service.me())
-            .map { it.toPublicModel() }
+        return call(service.me())
+            .map { ApiMeConverter.convert(it) }
+    }
+
+    override fun best(): Single<Page<Post>> {
+        return call(service.best())
+            .map { ApiPostListConverter.convert(it) }
     }
 }
+

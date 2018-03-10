@@ -28,13 +28,15 @@ package org.jraf.klibreddit.model.account
 import java.util.Date
 
 data class Me(
+    val id: String,
+    val name: String,
+    val created: Date,
     val isEmployee: Boolean,
     val hasVisitedNewProfile: Boolean,
     val prefNoProfanity: Boolean,
     val isSuspended: Boolean,
     val prefGeopopular: String,
     val isSponsor: Boolean,
-    val id: String,
     val verified: Boolean,
     val over18: Boolean,
     val isGold: Boolean,
@@ -50,7 +52,5 @@ data class Me(
     val prefTopKarmaSubreddits: Boolean,
     val hasMail: Boolean,
     val prefShowSnoovatar: Boolean,
-    val name: String,
-    val created: Date,
     val commentKarma: Int
 )

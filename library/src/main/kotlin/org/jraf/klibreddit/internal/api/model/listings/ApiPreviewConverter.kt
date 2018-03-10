@@ -23,12 +23,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.api.model
+package org.jraf.klibreddit.internal.api.model.listings
 
-internal data class ApiAccessTokenResult(
-    val access_token: String,
-    val refresh_token: String?,
-    val token_type: String,
-    val expires_in: Int,
-    val scope: String
-)
+import org.jraf.klibreddit.internal.api.model.ApiConverter
+import org.jraf.klibreddit.model.listings.Preview
+
+internal object ApiPreviewConverter : ApiConverter<ApiPreview?, Preview?> {
+    override fun convert(apiModel: ApiPreview?) = if (apiModel == null) null else Preview(
+        apiModel.images.map { ApiImageConverter.convert(it) },
+        apiModel.enabled
+    )
+}

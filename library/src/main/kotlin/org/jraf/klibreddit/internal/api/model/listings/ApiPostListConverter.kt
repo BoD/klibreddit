@@ -23,12 +23,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.api.model
+package org.jraf.klibreddit.internal.api.model.listings
 
-internal data class ApiAccessTokenResult(
-    val access_token: String,
-    val refresh_token: String?,
-    val token_type: String,
-    val expires_in: Int,
-    val scope: String
-)
+import org.jraf.klibreddit.internal.api.model.ApiConverter
+import org.jraf.klibreddit.model.listings.Page
+import org.jraf.klibreddit.model.listings.Post
+
+internal object ApiPostListConverter : ApiConverter<ApiMeta<ApiList<ApiMeta<ApiPost>>>, Page<Post>> {
+    override fun convert(apiModel: ApiMeta<ApiList<ApiMeta<ApiPost>>>) = Page(
+        apiModel.data.before,
+        apiModel.data.after,
+        apiModel.data.children.map { ApiPostConverter.convert(it.data) }
+    )
+}

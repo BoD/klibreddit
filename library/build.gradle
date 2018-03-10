@@ -2,6 +2,7 @@ description = 'klibreddit-library'
 
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'maven-publish'
 
 compileKotlin {
@@ -51,7 +52,8 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
 
     // Moshi
-    implementation "com.squareup.moshi:moshi-kotlin:$versions.moshi"
+    // XXX Not using 1.5.0 because of https://github.com/square/moshi/issues/309
+//    implementation "com.squareup.moshi:moshi-kotlin:$versions.moshi"
 
 }
 

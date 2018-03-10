@@ -32,7 +32,7 @@ import org.jraf.klibreddit.model.client.UserAgent
 import java.net.InetSocketAddress
 import java.net.Proxy
 
-object OkHttpHelper {
+internal object OkHttpHelper {
     private const val HEADER_USER_AGENT = "User-Agent"
     private const val HEADER_AUTHORIZATION = "Authorization"
     private const val BEARER = "bearer"

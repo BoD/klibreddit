@@ -25,11 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.account
 
-import org.jraf.klibreddit.model.account.Me
-import java.util.Date
-import java.util.concurrent.TimeUnit
-
-data class ApiMe(
+internal data class ApiMe(
     val is_employee: Boolean,
     val has_visited_new_profile: Boolean,
     val pref_no_profanity: Boolean,
@@ -59,32 +55,4 @@ data class ApiMe(
     val in_beta: Boolean,
     val comment_karma: Int,
     val has_subscribed: Boolean
-) {
-    fun toPublicModel() = Me(
-        is_employee,
-        has_visited_new_profile,
-        pref_no_profanity,
-        is_suspended,
-        pref_geopopular,
-        is_sponsor,
-        id,
-        verified,
-        over_18,
-        is_gold,
-        is_mod,
-        has_verified_email,
-        in_redesign_beta,
-        icon_img,
-        has_mod_mail,
-        oauth_client_id,
-        hide_from_robots,
-        link_karma,
-        inbox_count,
-        pref_top_karma_subreddits,
-        has_mail,
-        pref_show_snoovatar,
-        name,
-        Date(TimeUnit.SECONDS.toMillis(created_utc.toLong())),
-        comment_karma
-    )
-}
+)
