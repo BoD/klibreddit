@@ -87,4 +87,9 @@ data class Post(
     //     val media_embed: ApiMediaEmbed?,
     //     val secure_media_embed: ApiSecureMediaEmbed?,
 
-)
+
+) {
+    override fun toString(): String {
+        return "Post(id='$id', permalink='$permalink', title='$title')"
+    }
+}

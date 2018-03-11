@@ -30,6 +30,7 @@ import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.listings.Page
+import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.oauth.OAuthScope
 
@@ -43,5 +44,5 @@ interface RedditClient {
     fun setRefreshToken(refreshToken: String)
 
     fun me(): Single<Me>
-    fun best(): Single<Page<Post>>
+    fun best(pagination: Pagination): Single<Page<Post>>
 }

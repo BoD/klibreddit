@@ -36,6 +36,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 internal interface RedditService {
     companion object {
@@ -66,6 +67,10 @@ internal interface RedditService {
     fun me(): Single<ApiMe>
 
     @GET("best")
-    fun best(): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
+    fun best(
+        @Query("before") before: String?,
+        @Query("after") after: String?,
+        @Query("limit") limit: Int
+    ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
 
 }

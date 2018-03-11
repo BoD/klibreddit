@@ -25,11 +25,28 @@
 
 package org.jraf.klibreddit.model.listings
 
-data class Page<out T>(
-    private val before: String?,
-    private val after: String?,
-    val list: List<T>
-) {
-    val nextPageIndex = after?.let { After(it) }
-    val previousPageIndex = before?.let { Before(it) }
+data class Pagination(val pageIndex: PageIndex, val itemCount: Int = DEFAULT_ITEM_COUNT) {
+    companion object {
+        const val DEFAULT_ITEM_COUNT = 25
+    }
+}
+
+sealed class PageIndex {
+    internal abstract val before: String?
+    internal abstract val after: String?
+}
+
+object FirstPage : PageIndex() {
+    override val before: String? = null
+    override val after: String? = null
+}
+
+data class Before(private val elementId: String) : PageIndex() {
+    override val before = elementId
+    override val after: String? = null
+}
+
+data class After(private val elementId: String) : PageIndex() {
+    override val before: String? = null
+    override val after = elementId
 }

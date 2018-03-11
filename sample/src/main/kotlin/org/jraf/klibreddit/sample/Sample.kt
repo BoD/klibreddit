@@ -29,6 +29,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.UserAgent
+import org.jraf.klibreddit.model.listings.FirstPage
+import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 const val PLATFORM = "cli"
@@ -53,8 +55,12 @@ fun main(av: Array<String>) {
 
 
     client.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
+
 //    client.me()
 //        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
-    client.best()
+
+    client.best(Pagination(FirstPage, 2))
+        .doOnSuccess { println(it) }
+        .flatMap { client.best(Pagination(it.nextPageIndex!!, 2)) }
         .subscribeBy { println(it) }
 }

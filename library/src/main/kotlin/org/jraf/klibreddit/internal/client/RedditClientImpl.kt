@@ -42,6 +42,7 @@ import org.jraf.klibreddit.internal.util.UriUtil.queryParams
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.listings.Page
+import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.oauth.OAuthScope
 import retrofit2.Retrofit
@@ -152,8 +153,14 @@ internal class RedditClientImpl(
             .map { ApiMeConverter.convert(it) }
     }
 
-    override fun best(): Single<Page<Post>> {
-        return call(service.best())
+    override fun best(pagination: Pagination): Single<Page<Post>> {
+        return call(
+            service.best(
+                pagination.pageIndex.before,
+                pagination.pageIndex.after,
+                pagination.itemCount
+            )
+        )
             .map { ApiPostListConverter.convert(it) }
     }
 }
