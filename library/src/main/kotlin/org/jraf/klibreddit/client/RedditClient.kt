@@ -29,8 +29,10 @@ import io.reactivex.Single
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.listings.FirstPage
 import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination
+import org.jraf.klibreddit.model.listings.Period
 import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.oauth.OAuthScope
 
@@ -50,7 +52,13 @@ interface RedditClient {
     }
 
     interface Listings {
-        fun best(pagination: Pagination): Single<Page<Post>>
+        fun best(pagination: Pagination = Pagination(FirstPage)): Single<Page<Post>>
+
+        fun controversial(
+            subreddit: String? = null,
+            period: Period = Period.ALL,
+            pagination: Pagination = Pagination(FirstPage)
+        ): Single<Page<Post>>
     }
 
     val oAuth: OAuth

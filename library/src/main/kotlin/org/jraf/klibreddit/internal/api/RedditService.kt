@@ -36,6 +36,7 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 internal interface RedditService {
@@ -72,5 +73,15 @@ internal interface RedditService {
         @Query("after") after: String?,
         @Query("limit") limit: Int
     ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
+
+    @GET("{subreddit}/controversial")
+    fun controversial(
+        @Path("subreddit", encoded = true) subreddit: String?,
+        @Query("t") t: String,
+        @Query("before") before: String?,
+        @Query("after") after: String?,
+        @Query("limit") limit: Int
+    ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
+
 
 }

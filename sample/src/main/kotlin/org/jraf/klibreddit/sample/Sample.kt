@@ -56,11 +56,25 @@ fun main(av: Array<String>) {
 
     client.oAuth.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
 
-    client.account.me()
-        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+//    client.account.me()
+//        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 
-    client.listings.best(Pagination(FirstPage, 2))
+//    client.listings.best(Pagination(FirstPage, 2))
+//        .doOnSuccess { println(it) }
+//        .flatMap { client.listings.best(Pagination(it.nextPageIndex!!, 2)) }
+//        .subscribeBy { println(it) }
+
+
+    client.listings.controversial(
+        subreddit = "atheism",
+        pagination = Pagination(FirstPage, 2)
+    )
         .doOnSuccess { println(it) }
-        .flatMap { client.listings.best(Pagination(it.nextPageIndex!!, 2)) }
+        .flatMap {
+            client.listings.controversial(
+                subreddit = "atheism",
+                pagination = Pagination(it.nextPageIndex!!, 2)
+            )
+        }
         .subscribeBy { println(it) }
 }

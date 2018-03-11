@@ -43,6 +43,7 @@ import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination
+import org.jraf.klibreddit.model.listings.Period
 import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.oauth.OAuthScope
 import retrofit2.Retrofit
@@ -156,10 +157,18 @@ internal class RedditClientImpl(
 
     private fun <T> call(call: Single<T>): Single<T> = ensureAuthToken().andThen(call)
 
+
+    // Account
+
     override fun me(): Single<Me> {
         return call(service.me())
             .map { ApiMeConverter.convert(it) }
     }
+
+
+    // Listings
+
+    private fun String?.subreddit() = if (this == null) "" else if (startsWith("/r/")) this else "/r/$this"
 
     override fun best(pagination: Pagination): Single<Page<Post>> {
         return call(
@@ -171,5 +180,19 @@ internal class RedditClientImpl(
         )
             .map { ApiPostListConverter.convert(it) }
     }
+
+    override fun controversial(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
+        return call(
+            service.controversial(
+                subreddit.subreddit(),
+                period.name.toLowerCase(Locale.US),
+                pagination.pageIndex.before,
+                pagination.pageIndex.after,
+                pagination.itemCount
+            )
+        )
+            .map { ApiPostListConverter.convert(it) }
+    }
+
 }
 
