@@ -56,7 +56,11 @@ import java.util.concurrent.TimeUnit
 
 internal class RedditClientImpl(
     private val clientConfiguration: ClientConfiguration
-) : RedditClient, OkHttpHelper.AuthTokenProvider {
+) : RedditClient,
+    RedditClient.OAuth,
+    RedditClient.Account,
+    RedditClient.Listings,
+    OkHttpHelper.AuthTokenProvider {
 
     companion object {
         private const val URL_AUTHORIZE =
@@ -66,6 +70,10 @@ internal class RedditClientImpl(
         private const val GRANT_TYPE_AUTHORIZE = "authorization_code"
         private const val GRANT_REFRESH_TOKEN = "refresh_token"
     }
+
+    override val oAuth = this
+    override val account = this
+    override val listings = this
 
     private var oAuthTokens: OAuthTokens? = null
 

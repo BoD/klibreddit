@@ -49,18 +49,18 @@ fun main(av: Array<String>) {
         )
     )
 
-//    println(client.getAuthorizeUrl(*OAuthScope.values()))
-//    client.onAuthorizeRedirect("http://jraf.org/klibreddit?state=51ebeff1-0594-4fc6-ae33-85c8c11e71f1&code=SqC7DlgeE75v49-YqukUjHKTbJQ")
-//        .flatMap { client.me() }
-
-
-    client.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
-
-//    client.me()
+//    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
+//    client.oAuth.onAuthorizeRedirect("http://jraf.org/klibreddit?state=51ebeff1-0594-4fc6-ae33-85c8c11e71f1&code=SqC7DlgeE75v49-YqukUjHKTbJQ")
+//        .flatMap { client.account.me() }
 //        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 
-    client.best(Pagination(FirstPage, 2))
+    client.oAuth.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
+
+    client.account.me()
+        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+
+    client.listings.best(Pagination(FirstPage, 2))
         .doOnSuccess { println(it) }
-        .flatMap { client.best(Pagination(it.nextPageIndex!!, 2)) }
+        .flatMap { client.listings.best(Pagination(it.nextPageIndex!!, 2)) }
         .subscribeBy { println(it) }
 }

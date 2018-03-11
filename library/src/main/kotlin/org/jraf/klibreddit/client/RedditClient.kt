@@ -39,10 +39,21 @@ interface RedditClient {
         fun newRedditClient(configuration: ClientConfiguration): RedditClient = RedditClientImpl(configuration)
     }
 
-    fun getAuthorizeUrl(vararg scopes: OAuthScope): String
-    fun onAuthorizeRedirect(authorizeRedirectUri: String): Single<String>
-    fun setRefreshToken(refreshToken: String)
+    interface OAuth {
+        fun getAuthorizeUrl(vararg scopes: OAuthScope): String
+        fun onAuthorizeRedirect(authorizeRedirectUri: String): Single<String>
+        fun setRefreshToken(refreshToken: String)
+    }
 
-    fun me(): Single<Me>
-    fun best(pagination: Pagination): Single<Page<Post>>
+    interface Account {
+        fun me(): Single<Me>
+    }
+
+    interface Listings {
+        fun best(pagination: Pagination): Single<Page<Post>>
+    }
+
+    val oAuth: OAuth
+    val account: Account
+    val listings: Listings
 }
