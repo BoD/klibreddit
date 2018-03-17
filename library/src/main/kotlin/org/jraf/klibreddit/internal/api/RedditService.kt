@@ -74,14 +74,13 @@ internal interface RedditService {
         @Query("limit") limit: Int
     ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
 
-    @GET("{subreddit}/controversial")
-    fun controversial(
+    @GET("{subreddit}/{order}")
+    fun subredditPostsOrdered(
         @Path("subreddit", encoded = true) subreddit: String?,
-        @Query("t") t: String,
+        @Path("order") order: String,
+        @Query("t") t: String?,
         @Query("before") before: String?,
         @Query("after") after: String?,
         @Query("limit") limit: Int
     ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
-
-
 }

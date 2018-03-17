@@ -90,6 +90,6 @@ data class Post(
 
 ) {
     override fun toString(): String {
-        return "\nid: $id\nurl: $url\ntitle: $title\n\n"
+        return "\nid: $id\npermalink: $permalink\ntitle: $title\n\n"
     }
 }

@@ -65,14 +65,14 @@ fun main(av: Array<String>) {
 //        .subscribeBy { println(it) }
 
 
-    client.listings.controversial(
-        subreddit = "atheism",
+    client.listings.top(
+        subreddit = "all",
         pagination = Pagination(FirstPage, 2)
     )
         .doOnSuccess { println(it) }
         .flatMap {
-            client.listings.controversial(
-                subreddit = "atheism",
+            client.listings.top(
+                subreddit = "all",
                 pagination = Pagination(it.nextPageIndex!!, 2)
             )
         }

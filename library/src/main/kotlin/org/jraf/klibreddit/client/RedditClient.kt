@@ -52,9 +52,48 @@ interface RedditClient {
     }
 
     interface Listings {
+        /**
+         * Best posts of the subreddits you've subscribed to.
+         */
         fun best(pagination: Pagination = Pagination(FirstPage)): Single<Page<Post>>
 
+        /**
+         * Hot posts of all the subreddits you've subscribed to, or a specific subreddit.
+         */
+        fun hot(
+            subreddit: String? = null,
+            pagination: Pagination = Pagination(FirstPage)
+        ): Single<Page<Post>>
+
+        /**
+         * New posts of all the subreddits you've subscribed to, or a specific subreddit.
+         */
+        fun new(
+            subreddit: String? = null,
+            pagination: Pagination = Pagination(FirstPage)
+        ): Single<Page<Post>>
+
+        /**
+         * Rising posts of all the subreddits you've subscribed to, or a specific subreddit.
+         */
+        fun rising(
+            subreddit: String? = null,
+            pagination: Pagination = Pagination(FirstPage)
+        ): Single<Page<Post>>
+
+        /**
+         * Controversial posts of all the subreddits you've subscribed to, or a specific subreddit.
+         */
         fun controversial(
+            subreddit: String? = null,
+            period: Period = Period.ALL,
+            pagination: Pagination = Pagination(FirstPage)
+        ): Single<Page<Post>>
+
+        /**
+         * Top posts of all the subreddits you've subscribed to, or a specific subreddit.
+         */
+        fun top(
             subreddit: String? = null,
             period: Period = Period.ALL,
             pagination: Pagination = Pagination(FirstPage)

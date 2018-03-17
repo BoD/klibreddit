@@ -181,11 +181,17 @@ internal class RedditClientImpl(
             .map { ApiPostListConverter.convert(it) }
     }
 
-    override fun controversial(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
+    private fun subredditPostsOrdered(
+        subreddit: String?,
+        pagination: Pagination,
+        listingOrder: ListingOrder,
+        period: Period? = null
+    ): Single<Page<Post>> {
         return call(
-            service.controversial(
+            service.subredditPostsOrdered(
                 subreddit.subreddit(),
-                period.name.toLowerCase(Locale.US),
+                listingOrder.name.toLowerCase(Locale.US),
+                period?.name?.toLowerCase(Locale.US),
                 pagination.pageIndex.before,
                 pagination.pageIndex.after,
                 pagination.itemCount
@@ -194,5 +200,24 @@ internal class RedditClientImpl(
             .map { ApiPostListConverter.convert(it) }
     }
 
+    override fun hot(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
+        return subredditPostsOrdered(subreddit, pagination, ListingOrder.HOT)
+    }
+
+    override fun new(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
+        return subredditPostsOrdered(subreddit, pagination, ListingOrder.NEW)
+    }
+
+    override fun rising(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
+        return subredditPostsOrdered(subreddit, pagination, ListingOrder.RISING)
+    }
+
+    override fun controversial(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
+        return subredditPostsOrdered(subreddit, pagination, ListingOrder.CONTROVERSIAL, period)
+    }
+
+    override fun top(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
+        return subredditPostsOrdered(subreddit, pagination, ListingOrder.TOP, period)
+    }
 }
 
