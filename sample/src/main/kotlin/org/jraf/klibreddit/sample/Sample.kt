@@ -31,6 +31,7 @@ import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.FirstPage
 import org.jraf.klibreddit.model.listings.Pagination
+import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 const val PLATFORM = "cli"
@@ -66,14 +67,14 @@ fun main(av: Array<String>) {
 
 
     client.listings.top(
-        subreddit = "all",
-        pagination = Pagination(FirstPage, 2)
+        subreddit = Subreddits.POPULAR,
+        pagination = Pagination(FirstPage, 4)
     )
         .doOnSuccess { println(it) }
         .flatMap {
             client.listings.top(
-                subreddit = "all",
-                pagination = Pagination(it.nextPageIndex!!, 2)
+                subreddit = Subreddits.POPULAR,
+                pagination = Pagination(it.nextPageIndex!!, 4)
             )
         }
         .subscribeBy { println(it) }
