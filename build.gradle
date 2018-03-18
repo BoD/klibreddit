@@ -19,8 +19,7 @@ buildscript {
         json = '20171018'
         slf4j = '1.7.25'
         retrofit = '2.3.0'
-        // XXX Not using 1.5.0 because of https://github.com/square/moshi/issues/309
-        moshi = '1.4.0'
+        gson = '2.8.2'
         wireMock = '2.14.0'
     }
 

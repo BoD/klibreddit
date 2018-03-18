@@ -25,7 +25,6 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-import org.jraf.klibreddit.internal.api.model.DateOrNull
 
 /* internal */ data class ApiPost(
     val subreddit_id: String,
@@ -52,7 +51,7 @@ import org.jraf.klibreddit.internal.api.model.DateOrNull
     val domain: String,
     val hidden: Boolean,
     val preview: ApiPreview,
-    val edited: DateOrNull,
+    val edited: ApiOptionalDate,
     val contest_mode: Boolean,
     val gilded: Int,
     val downs: Int,

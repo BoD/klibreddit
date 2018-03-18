@@ -23,31 +23,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.api.model
+package org.jraf.klibreddit.internal.api.model.listings
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
-import org.jraf.klibreddit.internal.util.DateUtil.toDate
-import java.util.Date
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
+import java.lang.reflect.Type
 
-/* internal */ data class DateOrNull(val date: Date?)
 
-internal class DateOrNullAdapter {
-    @FromJson
-    fun fromJson(reader: JsonReader): DateOrNull {
-        val jsonValue = reader.readJsonValue()
-        return when (jsonValue) {
-            is Boolean -> DateOrNull(null)
-            is Double -> DateOrNull(jsonValue.toDate())
-            else -> throw JsonDataException("Expected a field of type Boolean or Double")
+/* internal */ data class ApiOptionalMeta<out T>(
+    val data: T?
+) {
+    object Deserializer : JsonDeserializer<ApiOptionalMeta<*>> {
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): ApiOptionalMeta<*> {
+            if (!json.isJsonObject) return ApiOptionalMeta<Any>(null)
+            return ApiOptionalMeta<Any>(context.deserialize(json.asJsonObject["data"], typeOfT))
         }
-    }
-
-    @ToJson
-    fun toJson(writer: JsonWriter, value: DateOrNull) {
-        throw UnsupportedOperationException()
     }
 }

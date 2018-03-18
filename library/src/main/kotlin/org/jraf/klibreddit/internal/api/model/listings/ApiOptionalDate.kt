@@ -25,7 +25,26 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-/* internal */ data class ApiCommentOrApiMore(
-    val apiComment: ApiComment?,
-    val apiMore: ApiMore?
-)
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
+import java.lang.reflect.Type
+import java.util.Date
+
+
+/* internal */ data class ApiOptionalDate(
+    val date: Date?
+) {
+    object Deserializer : JsonDeserializer<ApiOptionalDate> {
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): ApiOptionalDate {
+            if (json.asJsonPrimitive.isBoolean) return ApiOptionalDate(null)
+            return ApiOptionalDate(Date(json.asJsonPrimitive.asDouble.toLong() * 1000))
+        }
+    }
+}

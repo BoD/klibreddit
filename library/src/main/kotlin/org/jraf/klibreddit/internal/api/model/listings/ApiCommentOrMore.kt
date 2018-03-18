@@ -25,7 +25,28 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-/* internal */ data class ApiPostOrApiComment(
-    val apiPost: ApiPost?,
-    val apiComment: ApiComment?
-)
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
+import java.lang.reflect.Type
+
+/* internal */ data class ApiCommentOrMore(
+    val apiComment: ApiComment?,
+    val apiMore: ApiMore?
+) {
+    object Deserializer : JsonDeserializer<ApiCommentOrMore> {
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): ApiCommentOrMore {
+            return when (json.asJsonObject["kind"].asString) {
+                "t1" -> ApiCommentOrMore(context.deserialize(json.asJsonObject["data"], ApiComment::class.java), null)
+                "more" -> ApiCommentOrMore(null, context.deserialize(json.asJsonObject["data"], ApiMore::class.java))
+                else -> throw JsonParseException("Expected kind either 't1' or 'more'")
+            }
+        }
+    }
+}

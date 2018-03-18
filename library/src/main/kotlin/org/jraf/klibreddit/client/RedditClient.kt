@@ -27,7 +27,8 @@ package org.jraf.klibreddit.client
 
 import io.reactivex.Single
 import org.jraf.klibreddit.internal.api.model.listings.ApiList
-import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrApiComment
+import org.jraf.klibreddit.internal.api.model.listings.ApiMeta
+import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMore
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -101,7 +102,7 @@ interface RedditClient {
             pagination: Pagination = Pagination(FirstPage)
         ): Single<Page<Post>>
 
-        fun comments(postId: String): Single<List<ApiList<ApiPostOrApiComment>>>
+        fun comments(postId: String): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>>
     }
 
     val oAuth: OAuth

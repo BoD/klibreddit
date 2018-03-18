@@ -90,7 +90,7 @@ package org.jraf.klibreddit.internal.api.model.listings
     val subreddit_subscribers: Int,
 //    val user_reports: List<Any>,
     val is_reddit_media_domain: Boolean,
-    val edited: Boolean,
+    val edited: ApiOptionalDate,
     val quarantine: Boolean,
     val downs: Int,
     val hidden: Boolean,
@@ -107,13 +107,12 @@ package org.jraf.klibreddit.internal.api.model.listings
     val collapsed: Boolean,
     val body_html: String,
     val link_id: String,
-    val replies: String,
 //    val collapsed_reason: Any,
     val controversiality: Int,
     val is_submitter: Boolean,
     val parent_id: String,
     val depth: Int,
     val body: String,
-    val children: ApiMeta<ApiList<ApiCommentOrApiMore>>,
+    val replies: ApiOptionalMeta<ApiList<ApiCommentOrMore>>,
     val count: Int
 )
