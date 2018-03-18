@@ -45,7 +45,7 @@ package org.jraf.klibreddit.internal.api.model.account
     val hide_from_robots: Boolean,
     val link_karma: Int,
     val inbox_count: Int,
-    val pref_top_karma_subreddits: Boolean,
+    val pref_top_karma_subreddits: Boolean?,
     val has_mail: Boolean,
     val pref_show_snoovatar: Boolean,
     val name: String,

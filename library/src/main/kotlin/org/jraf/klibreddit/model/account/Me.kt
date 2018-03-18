@@ -49,7 +49,7 @@ data class Me(
     val hideFromRobots: Boolean,
     val linkKarma: Int,
     val inboxCount: Int,
-    val prefTopKarmaSubreddits: Boolean,
+    val prefTopKarmaSubreddits: Boolean?,
     val hasMail: Boolean,
     val prefShowSnoovatar: Boolean,
     val commentKarma: Int

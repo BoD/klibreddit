@@ -26,10 +26,15 @@
 package org.jraf.klibreddit.sample
 
 import io.reactivex.rxkotlin.subscribeBy
+import okhttp3.logging.HttpLoggingInterceptor
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.UserAgent
+import org.jraf.klibreddit.model.listings.FirstPage
+import org.jraf.klibreddit.model.listings.Pagination
+import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
+import org.jraf.klibreddit.model.oauth.OAuthScope
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
@@ -38,13 +43,14 @@ const val AUTHOR_REDDIT_NAME = "bodlulu"
 
 fun main(av: Array<String>) {
     val client = RedditClient.newRedditClient(
-        ClientConfiguration(
-            UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
-            OAuthConfiguration(
-                System.getenv("OAUTH_CLIENT_ID"),
-                System.getenv("OAUTH_REDIRECT_URI")
+            ClientConfiguration(
+                    UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
+                    OAuthConfiguration(
+                            System.getenv("OAUTH_CLIENT_ID"),
+                            System.getenv("OAUTH_REDIRECT_URI")
+                            ),
+                    loggingLevel = HttpLoggingInterceptor.Level.BODY
             )
-        )
     )
 
 //    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
