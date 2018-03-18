@@ -27,10 +27,12 @@ package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.DateOrNull
 
-internal data class ApiPost(
+/* internal */ data class ApiPost(
     val subreddit_id: String,
     val send_replies: Boolean,
+    val thumbnail: String,
     val thumbnail_width: Int?,
+    val thumbnail_height: Int?,
     val subreddit: String,
     val selftext_html: String?,
     val selftext: String?,
@@ -50,7 +52,6 @@ internal data class ApiPost(
     val domain: String,
     val hidden: Boolean,
     val preview: ApiPreview,
-    val thumbnail: String,
     val edited: DateOrNull,
     val contest_mode: Boolean,
     val gilded: Int,
@@ -61,7 +62,6 @@ internal data class ApiPost(
     val post_hint: String?,
     val stickied: Boolean,
     val can_gild: Boolean,
-    val thumbnail_height: Int?,
     val parent_whitelist_status: String?,
     val name: String,
     val spoiler: Boolean,

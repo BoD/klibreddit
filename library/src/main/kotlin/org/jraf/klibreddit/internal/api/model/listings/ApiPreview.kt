@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-internal data class ApiPreview(
+/* internal */ data class ApiPreview(
     val images: List<ApiImage>,
     val enabled: Boolean
 )

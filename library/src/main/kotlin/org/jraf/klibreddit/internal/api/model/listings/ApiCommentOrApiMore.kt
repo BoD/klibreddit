@@ -23,31 +23,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.api.model
+package org.jraf.klibreddit.internal.api.model.listings
 
-import com.squareup.moshi.FromJson
-import com.squareup.moshi.JsonDataException
-import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonWriter
-import com.squareup.moshi.ToJson
-import org.jraf.klibreddit.internal.util.DateUtil.toDate
-import java.util.Date
-
-/* internal */ data class DateOrNull(val date: Date?)
-
-internal class DateOrNullAdapter {
-    @FromJson
-    fun fromJson(reader: JsonReader): DateOrNull {
-        val jsonValue = reader.readJsonValue()
-        return when (jsonValue) {
-            is Boolean -> DateOrNull(null)
-            is Double -> DateOrNull(jsonValue.toDate())
-            else -> throw JsonDataException("Expected a field of type Boolean or Double")
-        }
-    }
-
-    @ToJson
-    fun toJson(writer: JsonWriter, value: DateOrNull) {
-        throw UnsupportedOperationException()
-    }
-}
+/* internal */ data class ApiCommentOrApiMore(
+    val apiComment: ApiComment?,
+    val apiMore: ApiMore?
+)

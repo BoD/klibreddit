@@ -25,4 +25,4 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-internal data class ApiMeta<out T>(val data: T)
+/* internal */ data class ApiMeta<out T>(val data: T)

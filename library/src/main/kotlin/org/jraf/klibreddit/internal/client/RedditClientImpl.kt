@@ -36,7 +36,11 @@ import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API_V1
 import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_OAUTH
 import org.jraf.klibreddit.internal.api.model.DateOrNullAdapter
 import org.jraf.klibreddit.internal.api.model.account.ApiMeConverter
+import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrApiMoreAdapter
+import org.jraf.klibreddit.internal.api.model.listings.ApiList
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
+import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrApiComment
+import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrApiCommentAdapter
 import org.jraf.klibreddit.internal.util.StringUtil.toUrlEncoded
 import org.jraf.klibreddit.internal.util.UriUtil.queryParams
 import org.jraf.klibreddit.model.account.Me
@@ -91,6 +95,8 @@ internal class RedditClientImpl(
 //                        .add(KotlinJsonAdapterFactory())
 //                        .add(ApplicationJsonAdapterFactory.INSTANCE)
                         .add(DateOrNullAdapter())
+                        .add(ApiCommentOrApiMoreAdapter())
+                        .add(ApiPostOrApiCommentAdapter())
                         .build()
                 )
             )
@@ -219,5 +225,10 @@ internal class RedditClientImpl(
     override fun top(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
         return subredditPostsOrdered(subreddit, pagination, ListingOrder.TOP, period)
     }
+
+    override fun comments(postId: String): Single<List<ApiList<ApiPostOrApiComment>>> {
+        return service.comments(postId)
+    }
+
 }
 

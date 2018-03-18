@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-internal data class ApiList<out T>(
+/* internal */ data class ApiList<out T>(
     val before: String?,
     val after: String?,
     val children: List<T>

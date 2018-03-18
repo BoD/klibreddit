@@ -29,9 +29,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.UserAgent
-import org.jraf.klibreddit.model.listings.FirstPage
-import org.jraf.klibreddit.model.listings.Pagination
-import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 const val PLATFORM = "cli"
@@ -66,16 +63,19 @@ fun main(av: Array<String>) {
 //        .subscribeBy { println(it) }
 
 
-    client.listings.top(
-        subreddit = Subreddits.POPULAR,
-        pagination = Pagination(FirstPage, 4)
-    )
-        .doOnSuccess { println(it) }
-        .flatMap {
-            client.listings.top(
-                subreddit = Subreddits.POPULAR,
-                pagination = Pagination(it.nextPageIndex!!, 4)
-            )
-        }
+//    client.listings.top(
+//        subreddit = Subreddits.POPULAR,
+//        pagination = Pagination(FirstPage, 4)
+//    )
+//        .doOnSuccess { println(it) }
+//        .flatMap {
+//            client.listings.top(
+//                subreddit = Subreddits.POPULAR,
+//                pagination = Pagination(it.nextPageIndex!!, 4)
+//            )
+//        }
+//        .subscribeBy { println(it) }
+
+    client.listings.comments("5gn8ru")
         .subscribeBy { println(it) }
 }

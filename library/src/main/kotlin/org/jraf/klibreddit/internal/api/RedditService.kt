@@ -31,6 +31,7 @@ import org.jraf.klibreddit.internal.api.model.account.ApiMe
 import org.jraf.klibreddit.internal.api.model.listings.ApiList
 import org.jraf.klibreddit.internal.api.model.listings.ApiMeta
 import org.jraf.klibreddit.internal.api.model.listings.ApiPost
+import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrApiComment
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -83,4 +84,9 @@ internal interface RedditService {
         @Query("after") after: String?,
         @Query("limit") limit: Int
     ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
+
+    @GET("comments/{postId}")
+    fun comments(
+        @Path("postId") order: String
+    ): Single<List<ApiList<ApiPostOrApiComment>>>
 }

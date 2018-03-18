@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.account
 
-internal data class ApiMe(
+/* internal */ data class ApiMe(
     val is_employee: Boolean,
     val has_visited_new_profile: Boolean,
     val pref_no_profanity: Boolean,
