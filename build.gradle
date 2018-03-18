@@ -21,6 +21,7 @@ buildscript {
         retrofit = '2.3.0'
         // XXX Not using 1.5.0 because of https://github.com/square/moshi/issues/309
         moshi = '1.4.0'
+        wireMock = '2.14.0'
     }
 
     repositories {

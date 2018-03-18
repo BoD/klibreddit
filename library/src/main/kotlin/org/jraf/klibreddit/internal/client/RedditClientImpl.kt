@@ -69,7 +69,7 @@ internal class RedditClientImpl(
 
     companion object {
         private const val URL_AUTHORIZE =
-            "${URL_BASE_API_V1}authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
+            "${URL_BASE_API_V1}/authorize.compact?client_id=%1\$s&response_type=code&state=%2\$s&redirect_uri=%3\$s&duration=permanent&scope=%4\$s"
 
         private const val AUTHORIZE_REDIRECT_PARAM_CODE = "code"
         private const val GRANT_TYPE_AUTHORIZE = "authorization_code"
@@ -100,7 +100,7 @@ internal class RedditClientImpl(
                         .build()
                 )
             )
-            .client(OkHttpHelper.provideOkHttpClient(clientConfiguration.userAgent, this))
+            .client(OkHttpHelper.provideOkHttpClient(clientConfiguration, this))
             .build()
             .create(RedditService::class.java)
     }

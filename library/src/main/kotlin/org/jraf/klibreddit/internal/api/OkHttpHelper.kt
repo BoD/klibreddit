@@ -28,45 +28,68 @@ package org.jraf.klibreddit.internal.api
 import io.reactivex.Single
 import okhttp3.Authenticator
 import okhttp3.OkHttpClient
-import org.jraf.klibreddit.model.client.UserAgent
+import okhttp3.logging.HttpLoggingInterceptor
+import org.jraf.klibreddit.model.client.ClientConfiguration
+import sun.net.www.protocol.http.HttpURLConnection.userAgent
 import java.net.InetSocketAddress
 import java.net.Proxy
+
 
 internal object OkHttpHelper {
     private const val HEADER_USER_AGENT = "User-Agent"
     private const val HEADER_AUTHORIZATION = "Authorization"
     private const val BEARER = "bearer"
 
-    fun provideOkHttpClient(userAgent: UserAgent, authTokenProvider: AuthTokenProvider): OkHttpClient {
-        return OkHttpClient.Builder()
+    fun provideOkHttpClient(
+        clientConfiguration: ClientConfiguration,
+        authTokenProvider: AuthTokenProvider
+    ): OkHttpClient {
+
+        val clientBuilder = OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = chain.request()
                 chain.proceed(
-                    request.newBuilder().apply {
-                        // Add user agent
-                        header(HEADER_USER_AGENT, userAgent.toString())
+                        request.newBuilder().apply {
+                            // Add user agent
+                            header(HEADER_USER_AGENT, clientConfiguration.userAgent.toString())
 
-                        if (request.header(HEADER_AUTHORIZATION) == null) {
-                            // Auth token, if present
-                            header(HEADER_AUTHORIZATION, "$BEARER ${authTokenProvider.authToken ?: "-"}")
+                            if (request.header(HEADER_AUTHORIZATION) == null) {
+                                // Auth token, if present
+                                header(HEADER_AUTHORIZATION, "$BEARER ${authTokenProvider.authToken ?: "-"}")
+                            }
+                            // Ask for raw json
+                            val urlBuilder = request.url().newBuilder()
+                            if (!clientConfiguration.mockServerHost.isEmpty()) {
+                                urlBuilder.host(clientConfiguration.mockServerHost)
+                                    .port(clientConfiguration.mockServerPort)
+                                    .scheme(clientConfiguration.mockServerScheme)
+                            }
+                            url(urlBuilder.addQueryParameter("raw_json", "1").build())
                         }
-
-                        // Ask for raw json
-                        url(request.url().newBuilder().addQueryParameter("raw_json", "1").build())
-                    }
-                        .build()
+                            .build()
                 )
             }
-            .authenticator(Authenticator { route, response ->
-                val request = response.request()
-                val newAuthToken = authTokenProvider.refreshAuthToken()
-                    .blockingGet()
-                request.newBuilder()
-                    .header(HEADER_AUTHORIZATION, "$BEARER $newAuthToken")
-                    .build()
-            })
-            .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 8888)))
-            .build()
+            .addInterceptor(HttpLoggingInterceptor().setLevel(clientConfiguration.loggingLevel))
+            .authenticator(
+                    Authenticator { route, response ->
+                        val request = response.request()
+                        val newAuthToken = authTokenProvider.refreshAuthToken()
+                            .blockingGet()
+                        request.newBuilder()
+                            .header(HEADER_AUTHORIZATION, "$BEARER $newAuthToken")
+                            .build()
+                    }
+            )
+        if (!clientConfiguration.proxyServerHost.isEmpty()) {
+            clientBuilder.proxy(
+                    Proxy(
+                            Proxy.Type.HTTP,
+                            InetSocketAddress(clientConfiguration.proxyServerHost, clientConfiguration.proxyServerPort)
+                    )
+            )
+        }
+
+        return clientBuilder.build()
     }
 
     interface AuthTokenProvider {

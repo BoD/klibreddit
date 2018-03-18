@@ -25,9 +25,16 @@
 
 package org.jraf.klibreddit.model.client
 
+import okhttp3.logging.HttpLoggingInterceptor
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 data class ClientConfiguration(
     val userAgent: UserAgent,
-    val oAuthConfiguration: OAuthConfiguration
+    val oAuthConfiguration: OAuthConfiguration,
+    val loggingLevel: HttpLoggingInterceptor.Level = HttpLoggingInterceptor.Level.NONE,
+    val proxyServerHost: String = "",
+    val proxyServerPort: Int = 0,
+    val mockServerScheme: String = "http",
+    val mockServerHost: String = "",
+    val mockServerPort: Int = 0
 )

@@ -50,6 +50,9 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+    implementation "com.squareup.okhttp3:logging-interceptor:$versions.okHttp"
+
+    testImplementation "com.github.tomakehurst:wiremock-standalone:$versions.wireMock"
 
     // Moshi
     // XXX Not using 1.5.0 because of https://github.com/square/moshi/issues/309
