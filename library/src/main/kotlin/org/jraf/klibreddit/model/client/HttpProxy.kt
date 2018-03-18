@@ -25,10 +25,7 @@
 
 package org.jraf.klibreddit.model.client
 
-import org.jraf.klibreddit.model.oauth.OAuthConfiguration
-
-data class ClientConfiguration(
-    val userAgent: UserAgent,
-    val oAuthConfiguration: OAuthConfiguration,
-    val httpConfiguration: HttpConfiguration = HttpConfiguration()
+data class HttpProxy(
+    val host: String,
+    val port: Int
 )

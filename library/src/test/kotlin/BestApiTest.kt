@@ -46,51 +46,51 @@ class BestApiTest : ApiTest() {
         assertNull(page1.previousPageIndex)
 
         validatePost(
-                page1.list[0],
-                "EmpireDidNothingWrong",
-                1521383873L,
-                "officialeskimo",
-                "All hail",
-                11309,
-                56,
-                "https://i.redd.it/woqucdcu9jm01.jpg"
+            page1.list[0],
+            "EmpireDidNothingWrong",
+            1521383873L,
+            "officialeskimo",
+            "All hail",
+            11309,
+            56,
+            "https://i.redd.it/woqucdcu9jm01.jpg"
         )
 
         validatePost(
-                page1.list[1],
-                "Eyebleach",
-                1521378145L,
-                "RespectMyAuthoriteh",
-                "He looks so guilty",
-                19499,
-                116,
-                "https://i.imgur.com/IfBGx3E.gifv"
+            page1.list[1],
+            "Eyebleach",
+            1521378145L,
+            "RespectMyAuthoriteh",
+            "He looks so guilty",
+            19499,
+            116,
+            "https://i.imgur.com/IfBGx3E.gifv"
         )
         val page2 = client.listings.best(Pagination(page1.nextPageIndex!!, 2)).blockingGet()
         assertEquals(2, page2.list.size)
         assertEquals(After("t3_85clp6"), page2.nextPageIndex)
 
         validatePost(
-                page2.list[0],
-                "PrequelMemes",
-                1521381507L,
-                "JunkNuggets",
+            page2.list[0],
+            "PrequelMemes",
+            1521381507L,
+            "JunkNuggets",
 
-                "When you have a job interview and the hiring manager’s first words are, “Hello there.”",
-                8080,
-                115,
-                "https://i.redd.it/0lvt2x7t2jm01.jpg"
+            "When you have a job interview and the hiring manager’s first words are, “Hello there.”",
+            8080,
+            115,
+            "https://i.redd.it/0lvt2x7t2jm01.jpg"
         )
 
         validatePost(
-                page2.list[1],
-                "happycowgifs",
-                1521393568L,
-                "NoBat0",
-                "Cow kisses",
-                441,
-                9,
-                "https://i.imgur.com/zAf5usd.gifv"
+            page2.list[1],
+            "happycowgifs",
+            1521393568L,
+            "NoBat0",
+            "Cow kisses",
+            441,
+            9,
+            "https://i.imgur.com/zAf5usd.gifv"
         )
         assertNull(page1.previousPageIndex)
     }
@@ -111,22 +111,22 @@ class BestApiTest : ApiTest() {
 
     private fun mockBestPage1Response(responseFile: String) {
         stubFor(
-                get(urlMatching("/best.limit=2&raw_json=1")).willReturn(
-                        aResponse().withStatus(200).withBodyFile(
-                                responseFile
-                        )
+            get(urlMatching("/best.limit=2&raw_json=1")).willReturn(
+                aResponse().withStatus(200).withBodyFile(
+                    responseFile
                 )
+            )
         )
     }
 
     private fun mockBestPage2Response(responseFile: String) {
         stubFor(
-                get(urlMatching("/best.after.*$"))
-                    .willReturn(
-                            aResponse()
-                                .withStatus(200)
-                                .withBodyFile(responseFile)
-                    )
+            get(urlMatching("/best.after.*$"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBodyFile(responseFile)
+                )
         )
     }
 

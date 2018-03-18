@@ -26,15 +26,13 @@
 package org.jraf.klibreddit.sample
 
 import io.reactivex.rxkotlin.subscribeBy
-import okhttp3.logging.HttpLoggingInterceptor
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.client.HttpConfiguration
+import org.jraf.klibreddit.model.client.HttpLoggingLevel
+import org.jraf.klibreddit.model.client.HttpProxy
 import org.jraf.klibreddit.model.client.UserAgent
-import org.jraf.klibreddit.model.listings.FirstPage
-import org.jraf.klibreddit.model.listings.Pagination
-import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
-import org.jraf.klibreddit.model.oauth.OAuthScope
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
@@ -42,15 +40,21 @@ const val VERSION = "1.0.0"
 const val AUTHOR_REDDIT_NAME = "bodlulu"
 
 fun main(av: Array<String>) {
+    // Logging
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
+
     val client = RedditClient.newRedditClient(
-            ClientConfiguration(
-                    UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
-                    OAuthConfiguration(
-                            System.getenv("OAUTH_CLIENT_ID"),
-                            System.getenv("OAUTH_REDIRECT_URI")
-                            ),
-                    loggingLevel = HttpLoggingInterceptor.Level.BODY
+        ClientConfiguration(
+            UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
+            OAuthConfiguration(
+                System.getenv("OAUTH_CLIENT_ID"),
+                System.getenv("OAUTH_REDIRECT_URI")
+            ),
+            HttpConfiguration(
+                loggingLevel = HttpLoggingLevel.BASIC,
+                httpProxy = HttpProxy("localhost", 8888)
             )
+        )
     )
 
 //    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
@@ -61,8 +65,8 @@ fun main(av: Array<String>) {
 
     client.oAuth.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
 
-//    client.account.me()
-//        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+    client.account.me()
+        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 
 //    client.listings.best(Pagination(FirstPage, 2))
 //        .doOnSuccess { println(it) }
@@ -83,6 +87,6 @@ fun main(av: Array<String>) {
 //        }
 //        .subscribeBy { println(it) }
 
-    client.listings.comments("5gn8ru")
-        .subscribeBy { println(it) }
+//    client.listings.comments("5gn8ru")
+//        .subscribeBy { println(it) }
 }

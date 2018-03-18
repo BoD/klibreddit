@@ -27,15 +27,21 @@ package org.jraf.klibreddit.internal.api
 
 import io.reactivex.Single
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
 import java.net.Proxy
 
 
 internal object OkHttpHelper {
+    private var LOGGER = LoggerFactory.getLogger(OkHttpHelper::class.java)
+
     private const val HEADER_USER_AGENT = "User-Agent"
     private const val HEADER_AUTHORIZATION = "Authorization"
     private const val BEARER = "bearer"
+    private const val PARAM_RAW_JSON_NAME = "raw_json"
+    private const val PARAM_RAW_JSON_VALUE = "1"
 
     fun provideOkHttpClient(
         clientConfiguration: ClientConfiguration,
@@ -47,26 +53,37 @@ internal object OkHttpHelper {
                 val request = chain.request()
                 chain.proceed(
                     request.newBuilder().apply {
-                        // Add user agent
+                        // User agent
                         header(HEADER_USER_AGENT, clientConfiguration.userAgent.toString())
 
+                        // Auth token, if present
                         if (request.header(HEADER_AUTHORIZATION) == null) {
-                            // Auth token, if present
                             header(HEADER_AUTHORIZATION, "$BEARER ${authTokenProvider.authToken ?: "-"}")
                         }
-                        // Ask for raw json
+
                         val urlBuilder = request.url().newBuilder()
-                        if (!clientConfiguration.mockServerHost.isEmpty()) {
-                            urlBuilder.host(clientConfiguration.mockServerHost)
-                                .port(clientConfiguration.mockServerPort)
-                                .scheme(clientConfiguration.mockServerScheme)
+
+                        // Use mock server, if configured
+                        clientConfiguration.httpConfiguration.mockServerBaserUri?.let {
+                            urlBuilder
+                                .scheme(it.scheme)
+                                .host(it.host)
+                                .port(it.port)
                         }
-                        url(urlBuilder.addQueryParameter("raw_json", "1").build())
+
+                        // Ask for raw json
+                        url(urlBuilder.addQueryParameter(PARAM_RAW_JSON_NAME, PARAM_RAW_JSON_VALUE).build())
                     }
                         .build()
                 )
             }
-            .addInterceptor(HttpLoggingInterceptor().setLevel(clientConfiguration.loggingLevel))
+
+            // Logging
+            .addInterceptor(HttpLoggingInterceptor {
+                LOGGER.trace(it)
+            }.setLevel(clientConfiguration.httpConfiguration.loggingLevel.okHttpLevel))
+
+            // Authenticator
             .authenticator { _, response ->
                 val request = response.request()
                 val newAuthToken = authTokenProvider.refreshAuthToken()
@@ -76,11 +93,12 @@ internal object OkHttpHelper {
                     .build()
             }
 
-        if (!clientConfiguration.proxyServerHost.isEmpty()) {
+        // Proxy, if configured
+        clientConfiguration.httpConfiguration.httpProxy?.let {
             clientBuilder.proxy(
                 Proxy(
                     Proxy.Type.HTTP,
-                    InetSocketAddress(clientConfiguration.proxyServerHost, clientConfiguration.proxyServerPort)
+                    InetSocketAddress(it.host, it.port)
                 )
             )
         }
@@ -92,5 +110,4 @@ internal object OkHttpHelper {
         val authToken: String?
         fun refreshAuthToken(): Single<String>
     }
-
 }

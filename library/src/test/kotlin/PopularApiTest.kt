@@ -42,60 +42,60 @@ class PopularApiTest : ApiTest() {
         mockBestPage1Response("popular_page1-response1.json")
         mockBestPage2Response("popular_page2-response1.json")
         val page1 = client.listings.top(
-                subreddit = Subreddits.POPULAR,
-                pagination = Pagination(FirstPage, 4)
+            subreddit = Subreddits.POPULAR,
+            pagination = Pagination(FirstPage, 4)
         ).blockingGet()
         assertEquals(4, page1.list.size)
         assertEquals(After("t3_5jrlw1"), page1.nextPageIndex)
         assertNull(page1.previousPageIndex)
 
         validatePost(
-                page1.list[0],
-                "funny", 1480959674L,
-                "iH8myPP",
-                "Guardians of the Front Page",
-                283488,
-                5069,
-                "http://i.imgur.com/OOFRJvr.gifv"
+            page1.list[0],
+            "funny", 1480959674L,
+            "iH8myPP",
+            "Guardians of the Front Page",
+            283488,
+            5069,
+            "http://i.imgur.com/OOFRJvr.gifv"
         )
         validatePost(
-                page1.list[1],
-                "pics",
-                1478651245,
-                "Itsjorgehernandez",
-                "Thanks, Obama.",
-                230825,
-                6169,
-                "https://i.reddituploads.com/58986555f545487c9d449bd5d9326528?fit=max&h=1536&w=1536&s=c15543d234ef9bbb27cb168b01afb87d"
+            page1.list[1],
+            "pics",
+            1478651245,
+            "Itsjorgehernandez",
+            "Thanks, Obama.",
+            230825,
+            6169,
+            "https://i.reddituploads.com/58986555f545487c9d449bd5d9326528?fit=max&h=1536&w=1536&s=c15543d234ef9bbb27cb168b01afb87d"
         )
 
         val page2 = client.listings.top(
-                subreddit = Subreddits.POPULAR,
-                pagination = Pagination(page1.nextPageIndex!!, 4)
+            subreddit = Subreddits.POPULAR,
+            pagination = Pagination(page1.nextPageIndex!!, 4)
         ).blockingGet()
         assertEquals(4, page2.list.size)
         assertEquals(After("t3_4vq7rj"), page2.nextPageIndex)
 
         validatePost(
-                page2.list[2],
-                "pics",
-                1485198917L,
-                "GallowBoob",
-                "Don't forget about this",
-                157911,
-                5379,
-                "http://i.imgur.com/7aGdxhe.jpg"
+            page2.list[2],
+            "pics",
+            1485198917L,
+            "GallowBoob",
+            "Don't forget about this",
+            157911,
+            5379,
+            "http://i.imgur.com/7aGdxhe.jpg"
         )
 
         validatePost(
-                page2.list[3],
-                "funny",
-                1470104173L,
-                "Nephelus",
-                "Due to all the health hazards surrounding the Rio Olympics, I figured they could use a new logo. [OC]",
-                141607,
-                2190,
-                "http://i.imgur.com/FApqk3D.jpg"
+            page2.list[3],
+            "funny",
+            1470104173L,
+            "Nephelus",
+            "Due to all the health hazards surrounding the Rio Olympics, I figured they could use a new logo. [OC]",
+            141607,
+            2190,
+            "http://i.imgur.com/FApqk3D.jpg"
         )
         assertNull(page1.previousPageIndex)
     }
@@ -116,22 +116,22 @@ class PopularApiTest : ApiTest() {
 
     private fun mockBestPage1Response(responseFile: String) {
         stubFor(
-                get(urlMatching("/r/popular/top.t=all.limit=.*$")).willReturn(
-                        aResponse().withStatus(200).withBodyFile(
-                                responseFile
-                        )
+            get(urlMatching("/r/popular/top.t=all.limit=.*$")).willReturn(
+                aResponse().withStatus(200).withBodyFile(
+                    responseFile
                 )
+            )
         )
     }
 
     private fun mockBestPage2Response(responseFile: String) {
         stubFor(
-                get(urlMatching("/r/popular/top.t=all.after.*$"))
-                    .willReturn(
-                            aResponse()
-                                .withStatus(200)
-                                .withBodyFile(responseFile)
-                    )
+            get(urlMatching("/r/popular/top.t=all.after.*$"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBodyFile(responseFile)
+                )
         )
     }
 

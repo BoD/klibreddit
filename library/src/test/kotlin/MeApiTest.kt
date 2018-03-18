@@ -51,12 +51,12 @@ class MeApiTest : ApiTest() {
 
     private fun mockMeResponse(responseFile: String) {
         stubFor(
-                get(urlMatching("/api/v1/me.*$"))
-                    .willReturn(
-                            aResponse()
-                                .withStatus(200)
-                                .withBodyFile(responseFile)
-                    )
+            get(urlMatching("/api/v1/me.*$"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBodyFile(responseFile)
+                )
         )
     }
 }

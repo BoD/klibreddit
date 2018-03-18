@@ -30,9 +30,11 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule
-import okhttp3.logging.HttpLoggingInterceptor
 import org.jraf.klibreddit.client.RedditClient
+import org.jraf.klibreddit.model.client.BaseUri
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.client.HttpConfiguration
+import org.jraf.klibreddit.model.client.HttpLoggingLevel
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 import org.junit.AfterClass
@@ -53,9 +55,9 @@ open class ApiTest {
         @ClassRule
         @JvmField
         var wireMockRule = WireMockClassRule(
-                WireMockConfiguration.wireMockConfig().dynamicPort().notifier(
-                        ConsoleNotifier(true)
-                )
+            WireMockConfiguration.wireMockConfig().dynamicPort().notifier(
+                ConsoleNotifier(true)
+            )
         )
 
         @AfterClass
@@ -66,28 +68,31 @@ open class ApiTest {
 
     @Before
     fun setup() {
+        // Logging
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
+
         mockAccessToken()
         client = RedditClient.newRedditClient(
-                ClientConfiguration(
-                        UserAgent("some platform", "some app id", "some version", "some author"),
-                        OAuthConfiguration("some_client_id", "some_redirect_uri"),
-                        loggingLevel = HttpLoggingInterceptor.Level.BODY,
-                        mockServerHost = "localhost",
-                        mockServerPort = wireMockRule.port(),
-                        mockServerScheme = "http"
+            ClientConfiguration(
+                UserAgent("some platform", "some app id", "some version", "some author"),
+                OAuthConfiguration("some_client_id", "some_redirect_uri"),
+                HttpConfiguration(
+                    loggingLevel = HttpLoggingLevel.BODY,
+                    mockServerBaserUri = BaseUri("http", "localhost", wireMockRule.port())
                 )
+            )
         )
         client.oAuth.setRefreshToken("some refresh token")
     }
 
     private fun mockAccessToken() {
         stubFor(
-                post(urlMatching("/api/v1/access_token.*$"))
-                    .willReturn(
-                            aResponse()
-                                .withStatus(200)
-                                .withBodyFile("access_token-response1.json")
-                    )
+            post(urlMatching("/api/v1/access_token.*$"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withBodyFile("access_token-response1.json")
+                )
         )
     }
 }

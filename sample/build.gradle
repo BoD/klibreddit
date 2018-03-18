@@ -19,8 +19,6 @@ dependencies {
 
     // Slf4j
     implementation "org.slf4j:slf4j-simple:$versions.slf4j"
-    implementation "com.squareup.okhttp3:logging-interceptor:$versions.okHttp"
-
 
     // Library
     implementation project(':library')

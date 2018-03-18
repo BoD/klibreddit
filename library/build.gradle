@@ -57,6 +57,9 @@ dependencies {
     // Gson
     implementation "com.google.code.gson:gson:$versions.gson"
 
+    // Slf4j
+    implementation "org.slf4j:slf4j-api:$versions.slf4j"
+
     // Wiremock
     testImplementation "com.github.tomakehurst:wiremock-standalone:$versions.wireMock"
 }
