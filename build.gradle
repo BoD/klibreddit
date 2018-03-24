@@ -6,11 +6,11 @@ buildscript {
     ext.versions.with {
         gradleVersionsPlugin = '0.17.0'
 
-        kotlin = '1.2.30'
+        kotlin = '1.2.31'
         rxJava = '2.1.7'
         rxKotlin = '2.2.0'
         junit = '4.12'
-        okHttp = '3.9.0'
+        okHttp = '3.10.0'
         libFrc = '1.8.0'
         twitter4j = '4.0.6'
         forecastIo = '1.6.0'
@@ -18,9 +18,9 @@ buildscript {
         klaxon = '2.1.2'
         json = '20171018'
         slf4j = '1.7.25'
-        retrofit = '2.3.0'
+        retrofit = '2.4.0'
         gson = '2.8.2'
-        wireMock = '2.14.0'
+        wireMock = '2.15.0'
     }
 
     repositories {
