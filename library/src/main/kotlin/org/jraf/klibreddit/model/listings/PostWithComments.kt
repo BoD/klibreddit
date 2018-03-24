@@ -23,12 +23,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.client
+package org.jraf.klibreddit.model.listings
 
-enum class ListingOrder {
-    HOT,
-    NEW,
-    RISING,
-    CONTROVERSIAL,
-    TOP,
-}
+data class PostWithComments(
+    val post: Post,
+    val comments: List<Comment>,
+    val moreCommentIds: List<String>
+)

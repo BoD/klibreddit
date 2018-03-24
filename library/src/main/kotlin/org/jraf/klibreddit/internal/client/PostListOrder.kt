@@ -23,9 +23,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.util
+package org.jraf.klibreddit.internal.client
 
-import java.util.Date
-import java.util.concurrent.TimeUnit
-
-internal fun Double.toDate(): Date = Date(TimeUnit.SECONDS.toMillis(toLong()))
+enum class PostListOrder {
+    HOT,
+    NEW,
+    RISING,
+    CONTROVERSIAL,
+    TOP,
+}

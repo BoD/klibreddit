@@ -27,11 +27,9 @@ package org.jraf.klibreddit.internal.util
 
 import java.net.URI
 
-internal object UriUtil {
-    val URI.queryParams
-        get() = query.split('&').map {
-            it.split('=').let { parts ->
-                parts[0] to parts[1]
-            }
-        }.associateBy({ it.first }, { it.second })
-}
+internal val URI.queryParams
+    get() = query.split('&').map {
+        it.split('=').let { parts ->
+            parts[0] to parts[1]
+        }
+    }.associateBy({ it.first }, { it.second })

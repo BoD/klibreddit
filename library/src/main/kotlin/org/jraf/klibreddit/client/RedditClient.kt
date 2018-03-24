@@ -26,9 +26,7 @@
 package org.jraf.klibreddit.client
 
 import io.reactivex.Single
-import org.jraf.klibreddit.internal.api.model.listings.ApiList
-import org.jraf.klibreddit.internal.api.model.listings.ApiMeta
-import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMore
+import org.jraf.klibreddit.internal.client.CommentListOrder
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -37,6 +35,7 @@ import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.Period
 import org.jraf.klibreddit.model.listings.Post
+import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthScope
 
 interface RedditClient {
@@ -102,7 +101,10 @@ interface RedditClient {
             pagination: Pagination = Pagination(FirstPage)
         ): Single<Page<Post>>
 
-        fun comments(postId: String): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>>
+        fun comments(
+            postId: String,
+            order: CommentListOrder = CommentListOrder.CONFIDENCE
+        ): Single<PostWithComments>
     }
 
     val oAuth: OAuth

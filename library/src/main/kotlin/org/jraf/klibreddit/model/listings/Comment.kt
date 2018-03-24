@@ -27,66 +27,52 @@ package org.jraf.klibreddit.model.listings
 
 import java.util.Date
 
-data class Post(
+data class Comment(
     val id: String,
-    val url: String,
+    val linkId: String,
     val permalink: String,
     val name: String,
+    val parentId: String,
 
-    val title: String,
-    val author: String,
-    val created: Date,
     val subreddit: String,
     val subredditId: String,
     val subredditNamePrefixed: String,
     val subredditType: String,
 
+    val author: String,
+    val created: Date,
+    val body: String,
+    val bodyHtml: String,
+
     val ups: Int,
     val downs: Int,
     val score: Int,
-    val hideScore: Boolean,
+    val scoreHidden: Boolean,
 
-    val numComments: Int,
-    val numCrossposts: Int,
+    val approvedAt: Date?,
+    val bannedAt: Date?,
 
-    val selftext: String?,
-    val selftextHtml: String?,
-
-    val thumbnail: String,
-    val thumbnailWidth: Int?,
-    val thumbnailHeight: Int?,
-
-    val preview: Preview?,
-
-    val archived: Boolean,
-    val brandSafe: Boolean,
-    val canGild: Boolean,
-    val canModPost: Boolean,
-    val clicked: Boolean,
-    val contestMode: Boolean,
-    val domain: String,
-    val edited: Date?,
-    val gilded: Int,
-    val hidden: Boolean,
-    val isCrosspostable: Boolean,
-    val isRedditMediaDomain: Boolean,
-    val isSelf: Boolean,
-    val isVideo: Boolean,
-    val locked: Boolean,
-    val noFollow: Boolean,
-    val over18: Boolean,
-    val pinned: Boolean,
-    val postHint: String?,
-    val quarantine: Boolean,
     val saved: Boolean,
+    val archived: Boolean,
+
+    val gilded: Int,
+    val canGild: Boolean,
+
+    val noFollow: Boolean,
+    val canModPost: Boolean,
     val sendReplies: Boolean,
-    val spoiler: Boolean,
+    val edited: Int?,
+    val collapsed: Boolean,
+    val isSubmitter: Boolean,
     val stickied: Boolean,
-    val visited: Boolean,
-    val whitelistStatus: String?,
-    val parentWhitelistStatus: String?
+    val controversiality: Int,
+
+    val depth: Int,
+
+    val replies: List<Comment>,
+    val moreReplyIds: List<String>
 ) {
     override fun toString(): String {
-        return "\nid: $id\npermalink: $permalink\ntitle: $title\n\n"
+        return "\nid: $id\npermalink: $permalink\nbody: $body\n\n"
     }
 }

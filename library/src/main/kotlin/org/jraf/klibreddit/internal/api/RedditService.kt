@@ -87,6 +87,7 @@ internal interface RedditService {
 
     @GET("comments/{postId}")
     fun comments(
-        @Path("postId") order: String
+        @Path("postId") postId: String,
+        @Query("order") order: String?
     ): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>>
 }

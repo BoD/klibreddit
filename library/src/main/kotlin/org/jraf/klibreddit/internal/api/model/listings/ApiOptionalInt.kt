@@ -23,9 +23,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.util
+package org.jraf.klibreddit.internal.api.model.listings
 
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonParseException
+import java.lang.reflect.Type
 
-internal fun Double.toDate(): Date = Date(TimeUnit.SECONDS.toMillis(toLong()))
+
+/* internal */ data class ApiOptionalInt(
+    val int: Int?
+) {
+    object Deserializer : JsonDeserializer<ApiOptionalInt> {
+        @Throws(JsonParseException::class)
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): ApiOptionalInt {
+            if (json.asJsonPrimitive.isBoolean) return ApiOptionalInt(null)
+            return ApiOptionalInt(json.asJsonPrimitive.asInt)
+        }
+    }
+}

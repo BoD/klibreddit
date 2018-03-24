@@ -36,20 +36,22 @@ import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API_V1
 import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_OAUTH
 import org.jraf.klibreddit.internal.api.model.account.ApiMeConverter
 import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrMore
-import org.jraf.klibreddit.internal.api.model.listings.ApiList
-import org.jraf.klibreddit.internal.api.model.listings.ApiMeta
 import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalDate
+import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalInt
 import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalMeta
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMore
-import org.jraf.klibreddit.internal.util.StringUtil.toUrlEncoded
-import org.jraf.klibreddit.internal.util.UriUtil.queryParams
+import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMoreListConverter
+import org.jraf.klibreddit.internal.util.nameLowerCase
+import org.jraf.klibreddit.internal.util.queryParams
+import org.jraf.klibreddit.internal.util.toUrlEncoded
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.Period
 import org.jraf.klibreddit.model.listings.Post
+import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthScope
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -98,6 +100,7 @@ internal class RedditClientImpl(
                         .registerTypeAdapter(ApiCommentOrMore::class.java, ApiCommentOrMore.Deserializer)
                         .registerTypeAdapter(ApiPostOrCommentOrMore::class.java, ApiPostOrCommentOrMore.Deserializer)
                         .registerTypeAdapter(ApiOptionalMeta::class.java, ApiOptionalMeta.Deserializer)
+                        .registerTypeAdapter(ApiOptionalInt::class.java, ApiOptionalInt.Deserializer)
                         .create()
                 )
             )
@@ -191,14 +194,14 @@ internal class RedditClientImpl(
     private fun subredditPostsOrdered(
         subreddit: String?,
         pagination: Pagination,
-        listingOrder: ListingOrder,
+        postListOrder: PostListOrder,
         period: Period? = null
     ): Single<Page<Post>> {
         return call(
             service.subredditPostsOrdered(
                 subreddit.subreddit(),
-                listingOrder.name.toLowerCase(Locale.US),
-                period?.name?.toLowerCase(Locale.US),
+                postListOrder.nameLowerCase,
+                period?.nameLowerCase,
                 pagination.pageIndex.before,
                 pagination.pageIndex.after,
                 pagination.itemCount
@@ -208,27 +211,31 @@ internal class RedditClientImpl(
     }
 
     override fun hot(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
-        return subredditPostsOrdered(subreddit, pagination, ListingOrder.HOT)
+        return subredditPostsOrdered(subreddit, pagination, PostListOrder.HOT)
     }
 
     override fun new(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
-        return subredditPostsOrdered(subreddit, pagination, ListingOrder.NEW)
+        return subredditPostsOrdered(subreddit, pagination, PostListOrder.NEW)
     }
 
     override fun rising(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
-        return subredditPostsOrdered(subreddit, pagination, ListingOrder.RISING)
+        return subredditPostsOrdered(subreddit, pagination, PostListOrder.RISING)
     }
 
     override fun controversial(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
-        return subredditPostsOrdered(subreddit, pagination, ListingOrder.CONTROVERSIAL, period)
+        return subredditPostsOrdered(subreddit, pagination, PostListOrder.CONTROVERSIAL, period)
     }
 
     override fun top(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
-        return subredditPostsOrdered(subreddit, pagination, ListingOrder.TOP, period)
+        return subredditPostsOrdered(subreddit, pagination, PostListOrder.TOP, period)
     }
 
-    override fun comments(postId: String): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>> {
-        return service.comments(postId)
+    override fun comments(
+        postId: String,
+        order: CommentListOrder
+    ): Single<PostWithComments> {
+        return service.comments(postId, order.nameLowerCase)
+            .map { ApiPostOrCommentOrMoreListConverter.convert(it) }
     }
 
 }

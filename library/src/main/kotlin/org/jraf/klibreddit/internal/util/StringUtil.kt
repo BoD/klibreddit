@@ -27,6 +27,4 @@ package org.jraf.klibreddit.internal.util
 
 import java.net.URLEncoder
 
-internal object StringUtil {
-    fun String.toUrlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8.name())
-}
+internal fun String.toUrlEncoded(): String = URLEncoder.encode(this, Charsets.UTF_8.name())

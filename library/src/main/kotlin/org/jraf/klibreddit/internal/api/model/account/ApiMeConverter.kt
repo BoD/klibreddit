@@ -26,7 +26,7 @@
 package org.jraf.klibreddit.internal.api.model.account
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.internal.util.DateUtil.toDate
+import org.jraf.klibreddit.internal.util.toDate
 import org.jraf.klibreddit.model.account.Me
 
 internal object ApiMeConverter : ApiConverter<ApiMe, Me> {

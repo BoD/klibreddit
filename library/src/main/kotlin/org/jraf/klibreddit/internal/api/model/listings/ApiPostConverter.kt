@@ -26,7 +26,7 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.internal.util.DateUtil.toDate
+import org.jraf.klibreddit.internal.util.toDate
 import org.jraf.klibreddit.model.listings.Post
 
 internal object ApiPostConverter : ApiConverter<ApiPost, Post> {
@@ -45,6 +45,7 @@ internal object ApiPostConverter : ApiConverter<ApiPost, Post> {
         apiModel.ups,
         apiModel.downs,
         apiModel.score,
+        apiModel.hide_score,
         apiModel.num_comments,
         apiModel.num_crossposts,
         apiModel.selftext,
@@ -63,7 +64,6 @@ internal object ApiPostConverter : ApiConverter<ApiPost, Post> {
         apiModel.edited.date,
         apiModel.gilded,
         apiModel.hidden,
-        apiModel.hide_score,
         apiModel.is_crosspostable,
         apiModel.is_reddit_media_domain,
         apiModel.is_self,

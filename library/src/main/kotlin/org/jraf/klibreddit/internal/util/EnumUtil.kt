@@ -25,7 +25,6 @@
 
 package org.jraf.klibreddit.internal.util
 
-import java.util.Date
-import java.util.concurrent.TimeUnit
+import java.util.Locale
 
-internal fun Double.toDate(): Date = Date(TimeUnit.SECONDS.toMillis(toLong()))
+internal val <E : Enum<E>> Enum<E>.nameLowerCase get() = name.toLowerCase(Locale.US)
