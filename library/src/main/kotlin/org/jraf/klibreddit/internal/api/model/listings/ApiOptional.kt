@@ -29,6 +29,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
+import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 
@@ -43,7 +44,9 @@ import java.lang.reflect.Type
             context: JsonDeserializationContext
         ): ApiOptionalMeta<*> {
             if (!json.isJsonObject) return ApiOptionalMeta<Any>(null)
-            return ApiOptionalMeta<Any>(context.deserialize(json.asJsonObject["data"], typeOfT))
+            val typeArgument = (typeOfT as ParameterizedType).actualTypeArguments[0]
+            val data = context.deserialize<Any?>(json.asJsonObject["data"], typeArgument)
+            return ApiOptionalMeta(data)
         }
     }
 }

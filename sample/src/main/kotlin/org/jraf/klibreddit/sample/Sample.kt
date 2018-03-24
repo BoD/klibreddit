@@ -65,8 +65,8 @@ fun main(av: Array<String>) {
 
     client.oAuth.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
 
-    client.account.me()
-        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+//    client.account.me()
+//        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 
 //    client.listings.best(Pagination(FirstPage, 2))
 //        .doOnSuccess { println(it) }
@@ -87,6 +87,6 @@ fun main(av: Array<String>) {
 //        }
 //        .subscribeBy { println(it) }
 
-//    client.listings.comments("5gn8ru")
-//        .subscribeBy { println(it) }
+    client.listings.comments("5gn8ru")
+        .subscribeBy { println(it) }
 }
