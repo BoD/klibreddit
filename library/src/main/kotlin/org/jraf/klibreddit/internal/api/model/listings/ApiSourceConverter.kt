@@ -26,8 +26,9 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.model.listings.Source
+import org.jraf.klibreddit.internal.model.listings.SourceImpl
 
-internal object ApiSourceConverter : ApiConverter<ApiSource, Source> {
-    override fun convert(apiModel: ApiSource) = Source(apiModel.url, apiModel.width, apiModel.height)
+internal object ApiSourceConverter : ApiConverter<ApiSource, SourceImpl> {
+    override fun convert(apiModel: ApiSource) =
+        SourceImpl(apiModel.url, apiModel.width, apiModel.height)
 }

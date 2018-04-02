@@ -26,11 +26,11 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
+import org.jraf.klibreddit.internal.model.listings.PostImpl
 import org.jraf.klibreddit.internal.util.toDate
-import org.jraf.klibreddit.model.listings.Post
 
-internal object ApiPostConverter : ApiConverter<ApiPost, Post> {
-    override fun convert(apiModel: ApiPost) = Post(
+internal object ApiPostConverter : ApiConverter<ApiPost, PostImpl> {
+    override fun convert(apiModel: ApiPost) = PostImpl(
         apiModel.id,
         apiModel.url,
         apiModel.permalink,

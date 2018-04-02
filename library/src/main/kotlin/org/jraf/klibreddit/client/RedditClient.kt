@@ -26,10 +26,10 @@
 package org.jraf.klibreddit.client
 
 import io.reactivex.Single
-import org.jraf.klibreddit.internal.client.CommentListOrder
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.listings.CommentListOrder
 import org.jraf.klibreddit.model.listings.FirstPage
 import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination

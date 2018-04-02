@@ -23,15 +23,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.client
+package org.jraf.klibreddit.internal.model.listings
 
-enum class CommentListOrder {
-    CONFIDENCE,
-    TOP,
-    NEW,
-    CONTROVERSIAL,
-    OLD,
-    RANDOM,
-    QA,
-    LIVE,
-}
+import org.jraf.klibreddit.model.listings.Comment
+import org.jraf.klibreddit.model.listings.Post
+import org.jraf.klibreddit.model.listings.PostWithComments
+
+internal data class PostWithCommentsImpl(
+    override val post: Post,
+    override val comments: List<Comment>,
+    override val moreCommentIds: List<String>
+) : PostWithComments

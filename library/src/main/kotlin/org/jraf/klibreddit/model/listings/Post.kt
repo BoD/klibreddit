@@ -27,66 +27,55 @@ package org.jraf.klibreddit.model.listings
 
 import java.util.Date
 
-data class Post(
-    val id: String,
-    val url: String,
-    val permalink: String,
-    val name: String,
-
-    val title: String,
-    val author: String,
-    val created: Date,
-    val subreddit: String,
-    val subredditId: String,
-    val subredditNamePrefixed: String,
-    val subredditType: String,
-
-    val ups: Int,
-    val downs: Int,
-    val score: Int,
-    val hideScore: Boolean,
-
-    val numComments: Int,
-    val numCrossposts: Int,
-
-    val selftext: String?,
-    val selftextHtml: String?,
-
-    val thumbnail: String,
-    val thumbnailWidth: Int?,
-    val thumbnailHeight: Int?,
-
-    val preview: Preview?,
-
-    val archived: Boolean,
-    val brandSafe: Boolean,
-    val canGild: Boolean,
-    val canModPost: Boolean,
-    val clicked: Boolean,
-    val contestMode: Boolean,
-    val domain: String,
-    val edited: Date?,
-    val gilded: Int,
-    val hidden: Boolean,
-    val isCrosspostable: Boolean,
-    val isRedditMediaDomain: Boolean,
-    val isSelf: Boolean,
-    val isVideo: Boolean,
-    val locked: Boolean,
-    val noFollow: Boolean,
-    val over18: Boolean,
-    val pinned: Boolean,
-    val postHint: String?,
-    val quarantine: Boolean,
-    val saved: Boolean,
-    val sendReplies: Boolean,
-    val spoiler: Boolean,
-    val stickied: Boolean,
-    val visited: Boolean,
-    val whitelistStatus: String?,
+interface Post {
+    val id: String
+    val url: String
+    val permalink: String
+    val name: String
+    val title: String
+    val author: String
+    val created: Date
+    val subreddit: String
+    val subredditId: String
+    val subredditNamePrefixed: String
+    val subredditType: String
+    val ups: Int
+    val downs: Int
+    val score: Int
+    val hideScore: Boolean
+    val numComments: Int
+    val numCrossposts: Int
+    val selftext: String?
+    val selftextHtml: String?
+    val thumbnail: String
+    val thumbnailWidth: Int?
+    val thumbnailHeight: Int?
+    val preview: Preview?
+    val archived: Boolean
+    val brandSafe: Boolean
+    val canGild: Boolean
+    val canModPost: Boolean
+    val clicked: Boolean
+    val contestMode: Boolean
+    val domain: String
+    val edited: Date?
+    val gilded: Int
+    val hidden: Boolean
+    val isCrosspostable: Boolean
+    val isRedditMediaDomain: Boolean
+    val isSelf: Boolean
+    val isVideo: Boolean
+    val locked: Boolean
+    val noFollow: Boolean
+    val over18: Boolean
+    val pinned: Boolean
+    val postHint: String?
+    val quarantine: Boolean
+    val saved: Boolean
+    val sendReplies: Boolean
+    val spoiler: Boolean
+    val stickied: Boolean
+    val visited: Boolean
+    val whitelistStatus: String?
     val parentWhitelistStatus: String?
-) {
-    override fun toString(): String {
-        return "\nid: $id\npermalink: $permalink\ntitle: $title\n\n"
-    }
 }

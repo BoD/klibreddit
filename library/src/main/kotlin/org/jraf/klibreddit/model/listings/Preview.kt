@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.model.listings
 
-data class Preview(
-    val images: List<Image>,
+interface Preview {
+    val images: List<Image>
     val enabled: Boolean
-)
+}

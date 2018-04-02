@@ -26,13 +26,14 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.model.listings.Page
-import org.jraf.klibreddit.model.listings.Post
+import org.jraf.klibreddit.internal.model.listings.PageImpl
+import org.jraf.klibreddit.internal.model.listings.PostImpl
 
-internal object ApiPostListConverter : ApiConverter<ApiMeta<ApiList<ApiMeta<ApiPost>>>, Page<Post>> {
-    override fun convert(apiModel: ApiMeta<ApiList<ApiMeta<ApiPost>>>) = Page(
-        apiModel.data.before,
-        apiModel.data.after,
-        apiModel.data.children.map { ApiPostConverter.convert(it.data) }
-    )
+internal object ApiPostListConverter : ApiConverter<ApiMeta<ApiList<ApiMeta<ApiPost>>>, PageImpl<PostImpl>> {
+    override fun convert(apiModel: ApiMeta<ApiList<ApiMeta<ApiPost>>>) =
+        PageImpl(
+            apiModel.data.before,
+            apiModel.data.after,
+            apiModel.data.children.map { ApiPostConverter.convert(it.data) }
+        )
 }

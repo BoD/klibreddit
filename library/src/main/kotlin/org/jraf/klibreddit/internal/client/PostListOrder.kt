@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.client
 
-enum class PostListOrder {
+internal enum class PostListOrder {
     HOT,
     NEW,
     RISING,

@@ -26,12 +26,12 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
+import org.jraf.klibreddit.internal.model.listings.CommentImpl
 import org.jraf.klibreddit.internal.util.toDate
-import org.jraf.klibreddit.model.listings.Comment
 
-internal object ApiCommentConverter : ApiConverter<ApiComment, Comment> {
-    override fun convert(apiModel: ApiComment): Comment {
-        val replies = mutableListOf<Comment>()
+internal object ApiCommentConverter : ApiConverter<ApiComment, CommentImpl> {
+    override fun convert(apiModel: ApiComment): CommentImpl {
+        val replies = mutableListOf<CommentImpl>()
         var moreReplyIds = emptyList<String>()
         if (apiModel.replies.data != null) {
             for ((apiComment, apiMore) in apiModel.replies.data.children) {
@@ -43,7 +43,7 @@ internal object ApiCommentConverter : ApiConverter<ApiComment, Comment> {
                 }
             }
         }
-        return Comment(
+        return CommentImpl(
             apiModel.id,
             apiModel.link_id,
             apiModel.permalink,

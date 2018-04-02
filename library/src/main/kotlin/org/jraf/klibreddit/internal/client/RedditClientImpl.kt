@@ -47,6 +47,7 @@ import org.jraf.klibreddit.internal.util.queryParams
 import org.jraf.klibreddit.internal.util.toUrlEncoded
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.listings.CommentListOrder
 import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.Period

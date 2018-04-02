@@ -25,8 +25,8 @@
 
 package org.jraf.klibreddit.model.listings
 
-data class Source(
-    val url: String,
-    val width: Int,
+interface Source {
+    val url: String
+    val width: Int
     val height: Int
-)
+}

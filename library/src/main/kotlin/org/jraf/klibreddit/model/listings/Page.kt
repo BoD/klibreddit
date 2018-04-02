@@ -25,11 +25,8 @@
 
 package org.jraf.klibreddit.model.listings
 
-data class Page<out T>(
-    private val before: String?,
-    private val after: String?,
+interface Page<out T> {
     val list: List<T>
-) {
-    val nextPageIndex = after?.let { After(it) }
-    val previousPageIndex = before?.let { Before(it) }
+    val nextPageIndex: After?
+    val previousPageIndex: Before?
 }

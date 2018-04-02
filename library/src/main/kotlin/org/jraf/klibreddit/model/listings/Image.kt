@@ -25,9 +25,8 @@
 
 package org.jraf.klibreddit.model.listings
 
-data class Image(
-    val id: String,
-
-    val source: Source,
+interface Image {
+    val id: String
+    val source: Source
     val resolutions: List<Source>
-)
+}

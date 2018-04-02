@@ -23,12 +23,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.internal.api.model
+package org.jraf.klibreddit.internal.model.listings
 
-internal data class ApiAccessTokenResult(
-    val access_token: String,
-    val refresh_token: String?,
-    val token_type: String,
-    val expires_in: Int,
-    val scope: String
-)
+import org.jraf.klibreddit.model.listings.After
+import org.jraf.klibreddit.model.listings.Before
+import org.jraf.klibreddit.model.listings.Page
+
+internal data class PageImpl<out T>(
+    val before: String?,
+    val after: String?,
+    override val list: List<T>
+) : Page<T> {
+    override val nextPageIndex = after?.let { After(it) }
+    override val previousPageIndex = before?.let { Before(it) }
+}

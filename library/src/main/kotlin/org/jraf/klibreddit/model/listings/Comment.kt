@@ -27,52 +27,39 @@ package org.jraf.klibreddit.model.listings
 
 import java.util.Date
 
-data class Comment(
-    val id: String,
-    val linkId: String,
-    val permalink: String,
-    val name: String,
-    val parentId: String,
-
-    val subreddit: String,
-    val subredditId: String,
-    val subredditNamePrefixed: String,
-    val subredditType: String,
-
-    val author: String,
-    val created: Date,
-    val body: String,
-    val bodyHtml: String,
-
-    val ups: Int,
-    val downs: Int,
-    val score: Int,
-    val scoreHidden: Boolean,
-
-    val approvedAt: Date?,
-    val bannedAt: Date?,
-
-    val saved: Boolean,
-    val archived: Boolean,
-
-    val gilded: Int,
-    val canGild: Boolean,
-
-    val noFollow: Boolean,
-    val canModPost: Boolean,
-    val sendReplies: Boolean,
-    val edited: Int?,
-    val collapsed: Boolean,
-    val isSubmitter: Boolean,
-    val stickied: Boolean,
-    val controversiality: Int,
-
-    val depth: Int,
-
-    val replies: List<Comment>,
+interface Comment {
+    val id: String
+    val linkId: String
+    val permalink: String
+    val name: String
+    val parentId: String
+    val subreddit: String
+    val subredditId: String
+    val subredditNamePrefixed: String
+    val subredditType: String
+    val author: String
+    val created: Date
+    val body: String
+    val bodyHtml: String
+    val ups: Int
+    val downs: Int
+    val score: Int
+    val scoreHidden: Boolean
+    val approvedAt: Date?
+    val bannedAt: Date?
+    val saved: Boolean
+    val archived: Boolean
+    val gilded: Int
+    val canGild: Boolean
+    val noFollow: Boolean
+    val canModPost: Boolean
+    val sendReplies: Boolean
+    val edited: Int?
+    val collapsed: Boolean
+    val isSubmitter: Boolean
+    val stickied: Boolean
+    val controversiality: Int
+    val depth: Int
+    val replies: List<Comment>
     val moreReplyIds: List<String>
-) {
-    override fun toString(): String {
-        return "\nid: $id\npermalink: $permalink\nbody: $body\n\n"
-    }
 }

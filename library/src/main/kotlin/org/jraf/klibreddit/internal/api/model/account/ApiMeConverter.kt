@@ -26,11 +26,11 @@
 package org.jraf.klibreddit.internal.api.model.account
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
+import org.jraf.klibreddit.internal.model.account.MeImpl
 import org.jraf.klibreddit.internal.util.toDate
-import org.jraf.klibreddit.model.account.Me
 
-internal object ApiMeConverter : ApiConverter<ApiMe, Me> {
-    override fun convert(apiModel: ApiMe) = Me(
+internal object ApiMeConverter : ApiConverter<ApiMe, MeImpl> {
+    override fun convert(apiModel: ApiMe) = MeImpl(
         apiModel.id,
         apiModel.name,
         apiModel.created_utc.toDate(),

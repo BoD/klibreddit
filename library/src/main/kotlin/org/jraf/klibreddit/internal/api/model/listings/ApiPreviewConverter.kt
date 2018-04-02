@@ -26,10 +26,10 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.model.listings.Preview
+import org.jraf.klibreddit.internal.model.listings.PreviewImpl
 
-internal object ApiPreviewConverter : ApiConverter<ApiPreview?, Preview?> {
-    override fun convert(apiModel: ApiPreview?) = if (apiModel == null) null else Preview(
+internal object ApiPreviewConverter : ApiConverter<ApiPreview?, PreviewImpl?> {
+    override fun convert(apiModel: ApiPreview?) = if (apiModel == null) null else PreviewImpl(
         apiModel.images.map { ApiImageConverter.convert(it) },
         apiModel.enabled
     )

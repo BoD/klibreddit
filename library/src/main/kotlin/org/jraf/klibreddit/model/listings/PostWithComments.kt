@@ -25,8 +25,8 @@
 
 package org.jraf.klibreddit.model.listings
 
-data class PostWithComments(
-    val post: Post,
-    val comments: List<Comment>,
+interface PostWithComments {
+    val post: Post
+    val comments: List<Comment>
     val moreCommentIds: List<String>
-)
+}

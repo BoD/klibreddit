@@ -26,11 +26,11 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.model.listings.Image
+import org.jraf.klibreddit.internal.model.listings.ImageImpl
 
-internal object ApiImageConverter : ApiConverter<ApiImage, Image> {
-    override fun convert(apiModel: ApiImage): Image {
-        return Image(
+internal object ApiImageConverter : ApiConverter<ApiImage, ImageImpl> {
+    override fun convert(apiModel: ApiImage): ImageImpl {
+        return ImageImpl(
             apiModel.id,
             ApiSourceConverter.convert(apiModel.source),
             apiModel.resolutions.map { ApiSourceConverter.convert(it) }

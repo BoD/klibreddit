@@ -26,15 +26,15 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
-import org.jraf.klibreddit.model.listings.Comment
-import org.jraf.klibreddit.model.listings.PostWithComments
+import org.jraf.klibreddit.internal.model.listings.CommentImpl
+import org.jraf.klibreddit.internal.model.listings.PostWithCommentsImpl
 
 internal object ApiPostOrCommentOrMoreListConverter :
-    ApiConverter<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>, PostWithComments> {
-    override fun convert(apiModel: List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>): PostWithComments {
+    ApiConverter<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>, PostWithCommentsImpl> {
+    override fun convert(apiModel: List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>): PostWithCommentsImpl {
         val post = ApiPostConverter.convert(apiModel[0].data.children[0].apiPost!!)
         val apiComments = apiModel[1].data.children
-        val comments = mutableListOf<Comment>()
+        val comments = mutableListOf<CommentImpl>()
         var moreCommentIds: List<String> = emptyList()
         for (apiComment in apiComments) {
             if (apiComment.apiComment != null) {
@@ -43,6 +43,6 @@ internal object ApiPostOrCommentOrMoreListConverter :
                 moreCommentIds = apiComment.apiMore.children
             }
         }
-        return PostWithComments(post, comments, moreCommentIds)
+        return PostWithCommentsImpl(post, comments, moreCommentIds)
     }
 }
