@@ -234,7 +234,7 @@ internal class RedditClientImpl(
         postId: String,
         order: CommentListOrder
     ): Single<PostWithComments> {
-        return service.comments(postId, order.nameLowerCase)
+        return call(service.comments(postId, order.nameLowerCase))
             .map { ApiPostOrCommentOrMoreListConverter.convert(it) }
     }
 
