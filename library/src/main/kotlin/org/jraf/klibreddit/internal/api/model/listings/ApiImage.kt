@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-/* internal */ data class ApiImage(
+internal data class ApiImage(
     val source: ApiSource,
     val resolutions: List<ApiSource>,
     val id: String

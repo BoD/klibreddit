@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-/* internal */ data class ApiComment(
+internal data class ApiComment(
     val subreddit_id: String,
     val approved_at_utc: Double?,
     val ups: Int,

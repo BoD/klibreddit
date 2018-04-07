@@ -26,7 +26,7 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 
-/* internal */ data class ApiPost(
+internal data class ApiPost(
     val subreddit_id: String,
     val send_replies: Boolean,
     val thumbnail: String,

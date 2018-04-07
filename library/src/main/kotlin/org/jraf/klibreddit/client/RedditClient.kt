@@ -29,6 +29,7 @@ import io.reactivex.Single
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.listings.Comment
 import org.jraf.klibreddit.model.listings.CommentListOrder
 import org.jraf.klibreddit.model.listings.FirstPage
 import org.jraf.klibreddit.model.listings.Page
@@ -101,10 +102,20 @@ interface RedditClient {
             pagination: Pagination = Pagination(FirstPage)
         ): Single<Page<Post>>
 
+        /**
+         * Post with its comments.
+         */
         fun comments(
             postId: String,
-            order: CommentListOrder = CommentListOrder.CONFIDENCE
+            order: CommentListOrder = CommentListOrder.CONFIDENCE,
+            itemCount: Int = Pagination.DEFAULT_ITEM_COUNT,
+            maxDepth: Int = Pagination.DEFAULT_MAX_DEPTH
         ): Single<PostWithComments>
+
+        /**
+         * Retrieve more reply comments for the given comment.
+         */
+        fun moreReplies(comment: Comment): Single<Comment>
     }
 
     val oAuth: OAuth

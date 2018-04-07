@@ -23,31 +23,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jraf.klibreddit.model.listings
+package org.jraf.klibreddit.internal.api.model.listings
 
-data class Pagination(val pageIndex: PageIndex, val itemCount: Int = DEFAULT_ITEM_COUNT) {
-    companion object {
-        const val DEFAULT_ITEM_COUNT = 25
-        const val DEFAULT_MAX_DEPTH = 10
-    }
-}
-
-sealed class PageIndex {
-    internal abstract val before: String?
-    internal abstract val after: String?
-}
-
-object FirstPage : PageIndex() {
-    override val before: String? = null
-    override val after: String? = null
-}
-
-data class Before(private val elementId: String) : PageIndex() {
-    override val before = elementId
-    override val after: String? = null
-}
-
-data class After(private val elementId: String) : PageIndex() {
-    override val before: String? = null
-    override val after = elementId
-}
+internal data class ApiJsonEnvelope<out T>(val json: ApiJson<T>)

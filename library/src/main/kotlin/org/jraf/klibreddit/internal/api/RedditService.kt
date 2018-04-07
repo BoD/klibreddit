@@ -28,6 +28,8 @@ package org.jraf.klibreddit.internal.api
 import io.reactivex.Single
 import org.jraf.klibreddit.internal.api.model.ApiAccessTokenResult
 import org.jraf.klibreddit.internal.api.model.account.ApiMe
+import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrMore
+import org.jraf.klibreddit.internal.api.model.listings.ApiJsonEnvelope
 import org.jraf.klibreddit.internal.api.model.listings.ApiList
 import org.jraf.klibreddit.internal.api.model.listings.ApiMeta
 import org.jraf.klibreddit.internal.api.model.listings.ApiPost
@@ -42,7 +44,8 @@ import retrofit2.http.Query
 
 internal interface RedditService {
     companion object {
-        private const val PATH_API_V1 = "api/v1"
+        private const val PATH_API = "api"
+        private const val PATH_API_V1 = "$PATH_API/v1"
         const val URL_BASE_API_V1 = "https://api.reddit.com/$PATH_API_V1"
         const val URL_BASE_OAUTH = "https://oauth.reddit.com/"
     }
@@ -88,6 +91,14 @@ internal interface RedditService {
     @GET("comments/{postId}")
     fun comments(
         @Path("postId") postId: String,
-        @Query("order") order: String?
+        @Query("order") order: String?,
+        @Query("limit") limit: Int,
+        @Query("truncate") truncate: Int
     ): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>>
+
+    @GET("$PATH_API/morechildren?api_type=json")
+    fun morechildren(
+        @Query("children") children: String,
+        @Query("link_id") link_id: String
+    ): Single<ApiJsonEnvelope<ApiCommentOrMore>>
 }

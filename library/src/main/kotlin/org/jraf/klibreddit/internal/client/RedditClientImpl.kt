@@ -36,17 +36,20 @@ import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API_V1
 import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_OAUTH
 import org.jraf.klibreddit.internal.api.model.account.ApiMeConverter
 import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrMore
+import org.jraf.klibreddit.internal.api.model.listings.ApiJsonDataCommentOrMoreConverter
 import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalDate
 import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalInt
 import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalMeta
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMore
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMoreListConverter
+import org.jraf.klibreddit.internal.model.listings.CommentImpl
 import org.jraf.klibreddit.internal.util.nameLowerCase
 import org.jraf.klibreddit.internal.util.queryParams
 import org.jraf.klibreddit.internal.util.toUrlEncoded
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.model.listings.Comment
 import org.jraf.klibreddit.model.listings.CommentListOrder
 import org.jraf.klibreddit.model.listings.Page
 import org.jraf.klibreddit.model.listings.Pagination
@@ -233,10 +236,35 @@ internal class RedditClientImpl(
 
     override fun comments(
         postId: String,
-        order: CommentListOrder
+        order: CommentListOrder,
+        itemCount: Int,
+        maxDepth: Int
     ): Single<PostWithComments> {
-        return call(service.comments(postId, order.nameLowerCase))
+        return call(
+            service.comments(
+                postId,
+                order.nameLowerCase,
+                itemCount,
+                maxDepth
+            )
+        )
             .map { ApiPostOrCommentOrMoreListConverter.convert(it) }
+    }
+
+    override fun moreReplies(comment: Comment): Single<Comment> {
+        if (comment.moreReplyIds.isEmpty()) return Single.just(comment)
+
+        return call(
+            service.morechildren(
+                comment.moreReplyIds.joinToString(","),
+                comment.linkId
+            )
+        )
+            .map {
+                val replies = comment.replies.toMutableList()
+                replies += ApiJsonDataCommentOrMoreConverter.convert(it)
+                (comment as CommentImpl).copy(replies = replies, moreReplyIds = emptyList())
+            }
     }
 
 }

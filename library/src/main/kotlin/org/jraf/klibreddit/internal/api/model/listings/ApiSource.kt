@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-/* internal */ data class ApiSource(
+internal data class ApiSource(
     val url: String,
     val width: Int,
     val height: Int

@@ -70,7 +70,7 @@ internal data class CommentImpl(
 
     override val depth: Int,
 
-    override val replies: List<CommentImpl>,
+    override val replies: List<Comment>,
     override val moreReplyIds: List<String>
 ) : Comment {
     override fun toString(): String {

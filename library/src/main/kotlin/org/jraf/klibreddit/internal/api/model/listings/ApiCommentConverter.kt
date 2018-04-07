@@ -28,6 +28,7 @@ package org.jraf.klibreddit.internal.api.model.listings
 import org.jraf.klibreddit.internal.api.model.ApiConverter
 import org.jraf.klibreddit.internal.model.listings.CommentImpl
 import org.jraf.klibreddit.internal.util.toDate
+import java.util.Collections
 
 internal object ApiCommentConverter : ApiConverter<ApiComment, CommentImpl> {
     override fun convert(apiModel: ApiComment): CommentImpl {
@@ -76,8 +77,8 @@ internal object ApiCommentConverter : ApiConverter<ApiComment, CommentImpl> {
             apiModel.stickied,
             apiModel.controversiality,
             apiModel.depth,
-            replies,
-            moreReplyIds
+            Collections.unmodifiableList(replies),
+            Collections.unmodifiableList(moreReplyIds)
         )
     }
 }

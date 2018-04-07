@@ -31,7 +31,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import java.lang.reflect.Type
 
-/* internal */ data class ApiPostOrCommentOrMore(
+internal data class ApiPostOrCommentOrMore(
     val apiPost: ApiPost?,
     val apiComment: ApiComment?,
     val apiMore: ApiMore?

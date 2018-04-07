@@ -25,6 +25,7 @@
 
 package org.jraf.klibreddit.sample
 
+import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -87,6 +88,15 @@ fun main(av: Array<String>) {
 //        }
 //        .subscribeBy { println(it) }
 
-    client.listings.comments("88y8ed")
-        .subscribeBy { println(it) }
+    client.listings.comments("890iek", maxDepth = 1)
+        .doOnSuccess { println(it) }
+        .flatMap {
+            val firstComment = it.comments.first()
+            if (firstComment.moreReplyIds.isNotEmpty()) {
+                client.listings.moreReplies(firstComment)
+            } else {
+                Single.just(firstComment)
+            }
+        }
+        .subscribeBy { println(it.replies) }
 }

@@ -33,7 +33,7 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 
-/* internal */ data class ApiOptionalMeta<out T>(
+internal data class ApiOptionalMeta<out T>(
     val data: T?
 ) {
     object Deserializer : JsonDeserializer<ApiOptionalMeta<*>> {

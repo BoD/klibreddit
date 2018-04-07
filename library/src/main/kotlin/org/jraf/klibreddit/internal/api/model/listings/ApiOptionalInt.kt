@@ -32,7 +32,7 @@ import com.google.gson.JsonParseException
 import java.lang.reflect.Type
 
 
-/* internal */ data class ApiOptionalInt(
+internal data class ApiOptionalInt(
     val int: Int?
 ) {
     object Deserializer : JsonDeserializer<ApiOptionalInt> {

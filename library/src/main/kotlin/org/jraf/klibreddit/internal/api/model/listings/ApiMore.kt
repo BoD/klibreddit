@@ -25,6 +25,6 @@
 
 package org.jraf.klibreddit.internal.api.model.listings
 
-/* internal */ data class ApiMore(
+internal data class ApiMore(
     val children: List<String>
 )

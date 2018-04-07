@@ -33,7 +33,7 @@ import java.lang.reflect.Type
 import java.util.Date
 
 
-/* internal */ data class ApiOptionalDate(
+internal data class ApiOptionalDate(
     val date: Date?
 ) {
     object Deserializer : JsonDeserializer<ApiOptionalDate> {
