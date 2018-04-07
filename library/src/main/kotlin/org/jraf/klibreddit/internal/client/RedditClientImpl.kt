@@ -192,7 +192,7 @@ internal class RedditClientImpl(
                 pagination.itemCount
             )
         )
-            .map { ApiPostListConverter.convert(it) }
+            .map { ApiPostListConverter.convert(it to pagination.itemCount) }
     }
 
     private fun subredditPostsOrdered(
@@ -211,7 +211,7 @@ internal class RedditClientImpl(
                 pagination.itemCount
             )
         )
-            .map { ApiPostListConverter.convert(it) }
+            .map { ApiPostListConverter.convert(it to pagination.itemCount) }
     }
 
     override fun hot(subreddit: String?, pagination: Pagination): Single<Page<Post>> {

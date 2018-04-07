@@ -26,6 +26,7 @@
 package org.jraf.klibreddit.internal.api.model.listings
 
 import org.jraf.klibreddit.internal.api.model.ApiConverter
+import org.jraf.klibreddit.internal.model.listings.CommentImpl
 import org.jraf.klibreddit.internal.util.PREFIX_COMMENT
 import org.jraf.klibreddit.model.listings.Comment
 
@@ -53,6 +54,18 @@ internal object ApiJsonDataCommentOrMoreConverter :
             }
         }
 
-        return depth0Comments
+        return depth0Comments.map { updateReferences(it as CommentImpl, commentsById) }
+    }
+
+    private fun updateReferences(comment: CommentImpl, commentsById: MutableMap<String, CommentImpl>): CommentImpl {
+        var c = commentsById[comment.id]!!
+        val replies = mutableListOf<CommentImpl>()
+        for (reply in c.replies) {
+            // Recursion
+            replies += updateReferences(reply as CommentImpl, commentsById)
+        }
+        c = c.copy(replies = replies)
+        commentsById[c.id] = c
+        return c
     }
 }

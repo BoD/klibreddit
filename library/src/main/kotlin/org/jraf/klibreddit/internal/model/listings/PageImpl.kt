@@ -28,12 +28,16 @@ package org.jraf.klibreddit.internal.model.listings
 import org.jraf.klibreddit.model.listings.After
 import org.jraf.klibreddit.model.listings.Before
 import org.jraf.klibreddit.model.listings.Page
+import org.jraf.klibreddit.model.listings.Pagination
 
 internal data class PageImpl<out T>(
-    val before: String?,
-    val after: String?,
+    private val before: String?,
+    private val after: String?,
+    private val itemCount: Int,
     override val list: List<T>
 ) : Page<T> {
     override val nextPageIndex = after?.let { After(it) }
     override val previousPageIndex = before?.let { Before(it) }
+    override val nextPagination = nextPageIndex?.let { Pagination(nextPageIndex, itemCount) }
+    override val previousPagination = previousPageIndex?.let { Pagination(previousPageIndex, itemCount) }
 }

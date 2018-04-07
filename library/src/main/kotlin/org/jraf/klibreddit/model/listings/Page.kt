@@ -29,4 +29,6 @@ interface Page<out T> {
     val list: List<T>
     val nextPageIndex: After?
     val previousPageIndex: Before?
+    val nextPagination: Pagination?
+    val previousPagination: Pagination?
 }

@@ -25,7 +25,6 @@
 
 package org.jraf.klibreddit.sample
 
-import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -33,6 +32,10 @@ import org.jraf.klibreddit.model.client.HttpConfiguration
 import org.jraf.klibreddit.model.client.HttpLoggingLevel
 import org.jraf.klibreddit.model.client.HttpProxy
 import org.jraf.klibreddit.model.client.UserAgent
+import org.jraf.klibreddit.model.listings.Comment
+import org.jraf.klibreddit.model.listings.FirstPage
+import org.jraf.klibreddit.model.listings.Pagination
+import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 const val PLATFORM = "cli"
@@ -75,28 +78,54 @@ fun main(av: Array<String>) {
 //        .subscribeBy { println(it) }
 
 
-//    client.listings.top(
-//        subreddit = Subreddits.POPULAR,
-//        pagination = Pagination(FirstPage, 4)
-//    )
-//        .doOnSuccess { println(it) }
-//        .flatMap {
-//            client.listings.top(
-//                subreddit = Subreddits.POPULAR,
-//                pagination = Pagination(it.nextPageIndex!!, 4)
-//            )
-//        }
-//        .subscribeBy { println(it) }
-
-    client.listings.comments("890iek", maxDepth = 1)
+    client.listings.top(
+        subreddit = Subreddits.POPULAR,
+        pagination = Pagination(FirstPage, 4)
+    )
         .doOnSuccess { println(it) }
         .flatMap {
-            val firstComment = it.comments.first()
-            if (firstComment.moreReplyIds.isNotEmpty()) {
-                client.listings.moreReplies(firstComment)
-            } else {
-                Single.just(firstComment)
-            }
+            client.listings.top(
+                subreddit = Subreddits.POPULAR,
+                pagination = it.nextPagination!!
+            )
         }
-        .subscribeBy { println(it.replies) }
+        .doOnSuccess { println(it) }
+        .flatMap {
+            client.listings.comments(it.list.first().id)
+        }
+        .subscribeBy { it.comments.forEach { printCommentWithReplies(it) } }
+
+//    client.listings.comments("890iek", maxDepth = 1)
+//        .doOnSuccess { it.comments.forEach { printCommentWithReplies(it) } }
+//        .flatMap {
+//            val firstComment = it.comments.first()
+//            if (firstComment.moreReplyIds.isNotEmpty()) {
+//                client.listings.moreReplies(firstComment)
+//            } else {
+//                Single.just(firstComment)
+//            }
+//        }
+//        .subscribeBy { printCommentWithReplies(it) }
+}
+
+fun printCommentWithReplies(comment: Comment, depth: Int = 0) {
+    val indent = repeatString("    ", depth)
+    val separator = repeatString("-", 72)
+    println("$indent$separator")
+    println("${indent}Author: ${comment.author}")
+    println("${indent}Date: ${comment.created}")
+    println(indent)
+    println("$indent${comment.body}")
+    println("$indent$separator")
+    println()
+    for (reply in comment.replies) {
+        // Recursion
+        printCommentWithReplies(reply, depth + 1)
+    }
+}
+
+private fun repeatString(s: String, times: Int): String {
+    var res = ""
+    for (i in 0 until times) res += s
+    return res
 }
