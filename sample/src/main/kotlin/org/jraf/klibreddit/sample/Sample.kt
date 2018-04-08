@@ -26,6 +26,7 @@
 package org.jraf.klibreddit.sample
 
 import io.reactivex.rxkotlin.subscribeBy
+import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.HttpConfiguration
@@ -115,7 +116,7 @@ fun printCommentWithReplies(comment: Comment, depth: Int = 0) {
     println("${indent}Author: ${comment.author}")
     println("${indent}Date: ${comment.created}")
     println(indent)
-    println("$indent${comment.body}")
+    println(indent + comment.body.wrapAndIndent(72, indent))
     println("$indent$separator")
     println()
     for (reply in comment.replies) {
@@ -128,4 +129,9 @@ private fun repeatString(s: String, times: Int): String {
     var res = ""
     for (i in 0 until times) res += s
     return res
+}
+
+private fun String.wrapAndIndent(wrapSize: Int, indent: String): String {
+    val wrapped = WordUtils.wrap(this, wrapSize)
+    return wrapped.trimEnd().replace("\n", "\n$indent")
 }

@@ -27,8 +27,7 @@ package org.jraf.klibreddit.model.listings
 
 data class Pagination(val pageIndex: PageIndex, val itemCount: Int = DEFAULT_ITEM_COUNT) {
     companion object {
-        const val DEFAULT_ITEM_COUNT = 25
-        const val DEFAULT_MAX_DEPTH = 10
+        const val DEFAULT_ITEM_COUNT = 50
     }
 }
 

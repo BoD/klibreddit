@@ -20,6 +20,9 @@ dependencies {
     // Slf4j
     implementation "org.slf4j:slf4j-simple:$versions.slf4j"
 
+    // Commons text
+    implementation "org.apache.commons:commons-text:$versions.apacheCommonsText"
+
     // Library
     implementation project(':library')
 }

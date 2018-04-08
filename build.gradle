@@ -21,6 +21,7 @@ buildscript {
         retrofit = '2.4.0'
         gson = '2.8.2'
         wireMock = '2.15.0'
+        apacheCommonsText = '1.2'
     }
 
     repositories {

@@ -108,8 +108,8 @@ interface RedditClient {
         fun comments(
             postId: String,
             order: CommentListOrder = CommentListOrder.CONFIDENCE,
-            itemCount: Int = Pagination.DEFAULT_ITEM_COUNT,
-            maxDepth: Int = Pagination.DEFAULT_MAX_DEPTH
+            itemCount: Int? = null,
+            maxDepth: Int? = null
         ): Single<PostWithComments>
 
         /**

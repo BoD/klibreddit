@@ -92,8 +92,8 @@ internal interface RedditService {
     fun comments(
         @Path("postId") postId: String,
         @Query("order") order: String?,
-        @Query("limit") limit: Int,
-        @Query("truncate") truncate: Int
+        @Query("limit") limit: Int?,
+        @Query("truncate") truncate: Int?
     ): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>>
 
     @GET("$PATH_API/morechildren?api_type=json")

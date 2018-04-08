@@ -237,8 +237,8 @@ internal class RedditClientImpl(
     override fun comments(
         postId: String,
         order: CommentListOrder,
-        itemCount: Int,
-        maxDepth: Int
+        itemCount: Int?,
+        maxDepth: Int?
     ): Single<PostWithComments> {
         return call(
             service.comments(
