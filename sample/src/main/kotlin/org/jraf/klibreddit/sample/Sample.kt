@@ -79,12 +79,14 @@ fun main(av: Array<String>) {
 //        .subscribeBy { println(it) }
 
 
+    // First page of /r/popular
     client.listings.top(
         subreddit = Subreddits.POPULAR,
         pagination = Pagination(FirstPage, 4)
     )
         .doOnSuccess { println(it) }
         .flatMap {
+            // Second page of /r/popular
             client.listings.top(
                 subreddit = Subreddits.POPULAR,
                 pagination = it.nextPagination!!
@@ -92,16 +94,27 @@ fun main(av: Array<String>) {
         }
         .doOnSuccess { println(it) }
         .flatMap {
+            // Comments of first post of second page of /r/popular
             client.listings.comments(it.list.first().id)
         }
-        .subscribeBy { it.comments.forEach { printCommentWithReplies(it) } }
+        // Print the comments
+        .doOnSuccess { it.comments.forEach { printCommentWithReplies(it) } }
+        .flatMap {
+            // Get more comments
+            client.listings.moreComments(it)
+        }
+        // Print the comments (there should be more)
+        .subscribeBy {
+            println(repeatString("*", 72))
+            it.comments.forEach { printCommentWithReplies(it) }
+        }
 
 //    client.listings.comments("890iek", maxDepth = 1)
 //        .doOnSuccess { it.comments.forEach { printCommentWithReplies(it) } }
 //        .flatMap {
 //            val firstComment = it.comments.first()
 //            if (firstComment.moreReplyIds.isNotEmpty()) {
-//                client.listings.moreReplies(firstComment)
+//                client.listings.moreComments(firstComment)
 //            } else {
 //                Single.just(firstComment)
 //            }

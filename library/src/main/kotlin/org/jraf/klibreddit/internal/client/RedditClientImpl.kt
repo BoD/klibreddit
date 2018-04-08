@@ -44,8 +44,10 @@ import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMore
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMoreListConverter
 import org.jraf.klibreddit.internal.model.listings.CommentImpl
+import org.jraf.klibreddit.internal.model.listings.PostWithCommentsImpl
 import org.jraf.klibreddit.internal.util.nameLowerCase
 import org.jraf.klibreddit.internal.util.queryParams
+import org.jraf.klibreddit.internal.util.split
 import org.jraf.klibreddit.internal.util.toUrlEncoded
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -82,6 +84,8 @@ internal class RedditClientImpl(
         private const val AUTHORIZE_REDIRECT_PARAM_CODE = "code"
         private const val GRANT_TYPE_AUTHORIZE = "authorization_code"
         private const val GRANT_REFRESH_TOKEN = "refresh_token"
+
+        private const val MORE_CHILDREN_MAX_IDS = 100
     }
 
     override val oAuth = this
@@ -251,19 +255,44 @@ internal class RedditClientImpl(
             .map { ApiPostOrCommentOrMoreListConverter.convert(it) }
     }
 
-    override fun moreReplies(comment: Comment): Single<Comment> {
+    override fun moreComments(comment: Comment): Single<Comment> {
         if (comment.moreReplyIds.isEmpty()) return Single.just(comment)
 
+        val moreReplyIds = comment.moreReplyIds.split(MORE_CHILDREN_MAX_IDS)
         return call(
             service.morechildren(
-                comment.moreReplyIds.joinToString(","),
+                moreReplyIds[0].joinToString(","),
                 comment.linkId
             )
         )
             .map {
                 val replies = comment.replies.toMutableList()
                 replies += ApiJsonDataCommentOrMoreConverter.convert(it)
-                (comment as CommentImpl).copy(replies = replies, moreReplyIds = emptyList())
+                (comment as CommentImpl).copy(
+                    replies = replies,
+                    moreReplyIds = moreReplyIds[1]
+                )
+            }
+    }
+
+    override fun moreComments(postWithComments: PostWithComments): Single<PostWithComments> {
+        if (postWithComments.moreCommentIds.isEmpty()) return Single.just(postWithComments)
+
+        val moreCommentIds = postWithComments.moreCommentIds.split(MORE_CHILDREN_MAX_IDS)
+        return call(
+            service.morechildren(
+                moreCommentIds[0].joinToString(","),
+                postWithComments.post.name
+            )
+        )
+            .map {
+                val comments = postWithComments.comments.toMutableList()
+                comments += ApiJsonDataCommentOrMoreConverter.convert(it)
+                (postWithComments as PostWithCommentsImpl).copy(
+                    post = postWithComments.post,
+                    comments = comments,
+                    moreCommentIds = moreCommentIds[1]
+                )
             }
     }
 

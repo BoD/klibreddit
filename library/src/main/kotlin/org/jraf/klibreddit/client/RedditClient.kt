@@ -115,7 +115,12 @@ interface RedditClient {
         /**
          * Retrieve more reply comments for the given comment.
          */
-        fun moreReplies(comment: Comment): Single<Comment>
+        fun moreComments(comment: Comment): Single<Comment>
+
+        /**
+         * Retrieve more comments for the given post with comments.
+         */
+        fun moreComments(postWithComments: PostWithComments): Single<PostWithComments>
     }
 
     val oAuth: OAuth
