@@ -25,7 +25,6 @@
 
 package org.jraf.klibreddit.sample
 
-import io.reactivex.rxkotlin.subscribeBy
 import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -34,9 +33,6 @@ import org.jraf.klibreddit.model.client.HttpLoggingLevel
 import org.jraf.klibreddit.model.client.HttpProxy
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
-import org.jraf.klibreddit.model.listings.FirstPage
-import org.jraf.klibreddit.model.listings.Pagination
-import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 const val PLATFORM = "cli"
@@ -79,39 +75,47 @@ fun main(av: Array<String>) {
 //        .subscribeBy { println(it) }
 
 
-    // First page of /r/popular
-    client.listings.top(
-        subreddit = Subreddits.POPULAR,
-        pagination = Pagination(FirstPage, 4)
-    )
-        .doOnSuccess { println(it) }
-        .flatMap {
-            // Second page of /r/popular
-            client.listings.top(
-                subreddit = Subreddits.POPULAR,
-                pagination = it.nextPagination!!
-            )
-        }
-        .doOnSuccess { println(it) }
-        .flatMap {
-            // Comments of first post of second page of /r/popular
-            client.listings.comments(it.list.first().id)
-        }
-        // Print the comments
-        .doOnSuccess { it.comments.forEach { printCommentWithReplies(it) } }
-        .flatMap {
-            // Get more comments
-            client.listings.moreComments(it)
-        }
-        // Print the comments (there should be more)
-        .subscribeBy {
-            println(repeatString("*", 72))
-            it.comments.forEach { printCommentWithReplies(it) }
-        }
-
-//    client.listings.comments("890iek", maxDepth = 1)
+//    // First page of /r/popular
+//    client.listings.top(
+//        subreddit = Subreddits.POPULAR,
+//        pagination = Pagination(FirstPage, 4)
+//    )
+//        .doOnSuccess { println(it) }
+//        .flatMap {
+//            // Second page of /r/popular
+//            client.listings.top(
+//                subreddit = Subreddits.POPULAR,
+//                pagination = it.nextPagination!!
+//            )
+//        }
+//        .doOnSuccess { println(it) }
+//        .flatMap {
+//            // Comments of first post of second page of /r/popular
+//            client.listings.comments(it.list.first().id)
+//        }
+//        // Print the comments
 //        .doOnSuccess { it.comments.forEach { printCommentWithReplies(it) } }
 //        .flatMap {
+//            // Get more comments
+//            client.listings.moreComments(it)
+//        }
+//        // Print the comments (there should be more)
+//        .subscribeBy {
+//            println(repeatString("*", 72))
+//            it.comments.forEach { printCommentWithReplies(it) }
+//        }
+
+    client.listings.comments("8aqt03", itemCount = 10)
+        .doOnSuccess { printComments(it.comments) }
+        .flatMap {
+            client.listings.moreComments(it)
+        }
+        .doOnSuccess {
+            println(repeatString("*", 120))
+            println()
+            printComments(it.comments)
+        }
+    //        .flatMap {
 //            val firstComment = it.comments.first()
 //            if (firstComment.moreReplyIds.isNotEmpty()) {
 //                client.listings.moreComments(firstComment)
@@ -119,22 +123,34 @@ fun main(av: Array<String>) {
 //                Single.just(firstComment)
 //            }
 //        }
-//        .subscribeBy { printCommentWithReplies(it) }
+
+
 }
 
-fun printCommentWithReplies(comment: Comment, depth: Int = 0) {
+
+fun printComments(
+    comments: List<Comment>,
+    withReplies: Boolean = true,
+    depth: Int = 0
+) {
     val indent = repeatString("    ", depth)
-    val separator = repeatString("-", 72)
-    println("$indent$separator")
-    println("${indent}Author: ${comment.author}")
-    println("${indent}Date: ${comment.created}")
-    println(indent)
-    println(indent + comment.body.wrapAndIndent(72, indent))
-    println("$indent$separator")
-    println()
-    for (reply in comment.replies) {
+    val separator = repeatString("─", 72)
+    for (comment in comments) {
+        println("$indent╭$separator")
+        println("${indent}│Author: ${comment.author}")
+        println("${indent}│Date: ${comment.created}")
+        if (!withReplies && comment.replies.isNotEmpty()) {
+            println("${indent}│Replies: ${comment.replies.size}")
+        }
+        if (comment.moreReplyIds.isNotEmpty()) {
+            println("${indent}│More replies: ${comment.moreReplyIds.size}")
+        }
+        println("$indent│")
+        println(indent + comment.body.wrapAndIndent(72, indent))
+        println("$indent╰$separator")
+        println()
         // Recursion
-        printCommentWithReplies(reply, depth + 1)
+        if (withReplies) printComments(comment.replies, withReplies, depth + 1)
     }
 }
 
@@ -146,5 +162,5 @@ private fun repeatString(s: String, times: Int): String {
 
 private fun String.wrapAndIndent(wrapSize: Int, indent: String): String {
     val wrapped = WordUtils.wrap(this, wrapSize)
-    return wrapped.trimEnd().replace("\n", "\n$indent")
+    return "│" + wrapped.trimEnd().replace("\n", "\n$indent│")
 }
