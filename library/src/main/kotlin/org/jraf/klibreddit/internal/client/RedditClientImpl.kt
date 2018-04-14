@@ -255,26 +255,6 @@ internal class RedditClientImpl(
             .map { ApiPostOrCommentOrMoreListConverter.convert(it) }
     }
 
-    override fun moreComments(comment: Comment): Single<Comment> {
-        if (comment.moreReplyIds.isEmpty()) return Single.just(comment)
-
-        val moreReplyIds = comment.moreReplyIds.split(MORE_CHILDREN_MAX_IDS)
-        return call(
-            service.morechildren(
-                moreReplyIds[0].joinToString(","),
-                comment.linkId
-            )
-        )
-            .map {
-                val replies = comment.replies.toMutableList()
-                replies += ApiJsonDataCommentOrMoreConverter.convert(it)
-                (comment as CommentImpl).copy(
-                    replies = replies,
-                    moreReplyIds = moreReplyIds[1]
-                )
-            }
-    }
-
     override fun moreComments(postWithComments: PostWithComments): Single<PostWithComments> {
         if (postWithComments.moreCommentIds.isEmpty()) return Single.just(postWithComments)
 
@@ -292,6 +272,26 @@ internal class RedditClientImpl(
                     post = postWithComments.post,
                     comments = comments,
                     moreCommentIds = moreCommentIds[1]
+                )
+            }
+    }
+
+    override fun moreComments(comment: Comment): Single<Comment> {
+        if (comment.moreReplyIds.isEmpty()) return Single.just(comment)
+
+        val moreReplyIds = comment.moreReplyIds.split(MORE_CHILDREN_MAX_IDS)
+        return call(
+            service.morechildren(
+                moreReplyIds[0].joinToString(","),
+                comment.linkId
+            )
+        )
+            .map {
+                val replies = comment.replies.toMutableList()
+                replies += ApiJsonDataCommentOrMoreConverter.convert(it)
+                (comment as CommentImpl).copy(
+                    replies = replies,
+                    moreReplyIds = moreReplyIds[1]
                 )
             }
     }

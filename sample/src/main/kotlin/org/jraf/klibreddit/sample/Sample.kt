@@ -25,6 +25,8 @@
 
 package org.jraf.klibreddit.sample
 
+import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -33,6 +35,7 @@ import org.jraf.klibreddit.model.client.HttpLoggingLevel
 import org.jraf.klibreddit.model.client.HttpProxy
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
+import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
 
 const val PLATFORM = "cli"
@@ -105,16 +108,17 @@ fun main(av: Array<String>) {
 //            it.comments.forEach { printCommentWithReplies(it) }
 //        }
 
-    client.listings.comments("8aqt03", itemCount = 10)
-        .doOnSuccess { printComments(it.comments) }
-        .flatMap {
-            client.listings.moreComments(it)
-        }
-        .doOnSuccess {
-            println(repeatString("*", 120))
-            println()
-            printComments(it.comments)
-        }
+//    client.listings.comments("8aqt03", itemCount = 10)
+//        .doOnSuccess { printComments(it.comments) }
+//        .flatMap {
+//            client.listings.moreComments(it)
+//        }
+//        .doOnSuccess {
+//            println(repeatString("*", 120))
+//            println()
+//            printComments(it.comments)
+//        }
+//        .subscribe()
     //        .flatMap {
 //            val firstComment = it.comments.first()
 //            if (firstComment.moreReplyIds.isNotEmpty()) {
@@ -124,9 +128,26 @@ fun main(av: Array<String>) {
 //            }
 //        }
 
+//    client.listings.comments("8aqt03")
+    client.listings.comments("8c47fe")
+        .flatMap(allCommentsRecursively(client))
+        .subscribeBy {
+            printComments(it.comments)
+        }
+
 
 }
 
+private fun allCommentsRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
+    return {
+        if (it.moreCommentIds.isNotEmpty()) {
+            client.listings.moreComments(it)
+                .flatMap(allCommentsRecursively(client))
+        } else {
+            Single.just(it)
+        }
+    }
+}
 
 fun printComments(
     comments: List<Comment>,
