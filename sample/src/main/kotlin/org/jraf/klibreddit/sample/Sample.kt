@@ -26,7 +26,6 @@
 package org.jraf.klibreddit.sample
 
 import io.reactivex.Single
-import io.reactivex.rxkotlin.subscribeBy
 import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -37,6 +36,7 @@ import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
 import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
+import java.util.Date
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
@@ -62,12 +62,14 @@ fun main(av: Array<String>) {
     )
 
 //    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
-//    client.oAuth.onAuthorizeRedirect("http://jraf.org/klibreddit?state=92179eb5-e76d-4992-888b-650213ee4113&code=m6nd1vz4hush7EFz2_O45H9fEM4")
+
+//    client.oAuth.onAuthorizeRedirect("http://jraf.org/klibreddit?state=7c8ff238-212c-4c39-9086-d72849a7e4b9&code=oBoQconTgEboprzSaLmobs89z_Y")
 //        .doOnSuccess { println("Your refresh token is $it") }
 //        .flatMap { client.account.me() }
 //        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 
     client.oAuth.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
+
 
 //    client.account.me()
 //        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
@@ -129,12 +131,25 @@ fun main(av: Array<String>) {
 //        }
 
 //    client.listings.comments("8aqt03")
-    client.listings.comments("8c47fe")
-        .flatMap(allCommentsRecursively(client))
-        .flatMap(allRepliesRecursively(client))
-        .subscribeBy {
+////    client.listings.comments("8c47fe")
+//        .flatMap(allCommentsRecursively(client))
+//        .flatMap(allRepliesRecursively(client))
+//        .subscribeBy {
+//            printComments(it.comments)
+//        }
+
+
+    client.listings.comments("8aqt03")
+        .doOnSuccess {
             printComments(it.comments)
         }
+        .map { it.comments.last() }
+        .doOnSuccess {
+            println(repeatString("*", 72))
+            if (it != null) printComments(listOf(it), false)
+        }
+        .flatMapCompletable { client.linksAndComments.comment(it, "This comment was posted on ${Date()}") }
+        .subscribe()
 }
 
 private fun allCommentsRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {

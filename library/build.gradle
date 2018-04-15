@@ -1,4 +1,4 @@
-description = 'klibreddit-library'
+description = 'klibreddit'
 
 apply plugin: 'java-library'
 apply plugin: 'kotlin'

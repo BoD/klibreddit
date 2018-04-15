@@ -25,6 +25,7 @@
 
 package org.jraf.klibreddit.internal.api
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import org.jraf.klibreddit.internal.api.model.ApiAccessTokenResult
 import org.jraf.klibreddit.internal.api.model.account.ApiMe
@@ -101,4 +102,11 @@ internal interface RedditService {
         @Query("children") children: String,
         @Query("link_id") link_id: String
     ): Single<ApiJsonEnvelope<ApiCommentOrMore>>
+
+    @POST("$PATH_API/comment?api_type=json")
+    @FormUrlEncoded
+    fun comment(
+        @Field("thing_id") thing_id: String,
+        @Field("text") text: String
+    ): Completable
 }

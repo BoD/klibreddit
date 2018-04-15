@@ -75,6 +75,7 @@ internal class RedditClientImpl(
     RedditClient.OAuth,
     RedditClient.Account,
     RedditClient.Listings,
+    RedditClient.LinksAndComments,
     OkHttpHelper.AuthTokenProvider {
 
     companion object {
@@ -91,6 +92,7 @@ internal class RedditClientImpl(
     override val oAuth = this
     override val account = this
     override val listings = this
+    override val linksAndComments = this
 
     private var oAuthTokens: OAuthTokens? = null
 
@@ -174,6 +176,14 @@ internal class RedditClientImpl(
     }
 
     private fun <T> call(call: Single<T>): Single<T> = ensureAuthToken().andThen(call)
+    private fun call(call: Completable): Completable = ensureAuthToken().andThen(call)
+
+    private fun String?.subreddit() = when {
+        this == null -> ""
+        startsWith("/r/") -> this
+        startsWith("r/") -> "/$this"
+        else -> "/r/$this"
+    }
 
 
     // Account
@@ -185,8 +195,6 @@ internal class RedditClientImpl(
 
 
     // Listings
-
-    private fun String?.subreddit() = if (this == null) "" else if (startsWith("/r/")) this else "/r/$this"
 
     override fun best(pagination: Pagination): Single<Page<Post>> {
         return call(
@@ -296,5 +304,11 @@ internal class RedditClientImpl(
             }
     }
 
-}
 
+    // LinksAndComments
+
+    override fun comment(comment: Comment, text: String): Completable {
+        return call(service.comment(comment.name, text))
+    }
+
+}

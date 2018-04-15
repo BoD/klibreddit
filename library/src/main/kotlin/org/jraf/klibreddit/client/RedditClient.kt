@@ -25,6 +25,7 @@
 
 package org.jraf.klibreddit.client
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
@@ -123,7 +124,16 @@ interface RedditClient {
         fun moreComments(comment: Comment): Single<Comment>
     }
 
+    interface LinksAndComments {
+        /**
+         * Post a reply to a comment.
+         */
+        fun comment(comment: Comment, text: String): Completable
+    }
+
+
     val oAuth: OAuth
     val account: Account
     val listings: Listings
+    val linksAndComments: LinksAndComments
 }
