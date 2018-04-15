@@ -33,4 +33,55 @@ internal data class PostWithCommentsImpl(
     override val post: Post,
     override val comments: List<Comment>,
     override val moreCommentIds: List<String>
-) : PostWithComments
+) : PostWithComments {
+    override fun updateComment(commentToSearchAndReplace: Comment): PostWithComments {
+        val newComments = mutableListOf<Comment>()
+        var found = false
+        for (origComment in comments) {
+            if (!found) {
+                if (origComment.id == commentToSearchAndReplace.id) {
+                    found = true
+                    newComments += commentToSearchAndReplace
+                } else {
+                    val updatedComment = updateComment(origComment, commentToSearchAndReplace)
+                    found = updatedComment !== origComment
+                    newComments += updatedComment
+                }
+            } else {
+                newComments += origComment
+            }
+        }
+        return if (found) {
+            copy(comments = newComments)
+        } else {
+            this
+        }
+    }
+
+    companion object {
+        private fun updateComment(parentComment: Comment, replyToSearchAndReplace: Comment): Comment {
+            val newReplies = mutableListOf<Comment>()
+            var found = false
+            for (origReply in parentComment.replies) {
+                if (!found) {
+                    if (origReply.id == replyToSearchAndReplace.id) {
+                        found = true
+                        newReplies += replyToSearchAndReplace
+                    } else {
+                        // Recurse
+                        val updatedReply = updateComment(origReply, replyToSearchAndReplace)
+                        found = updatedReply !== origReply
+                        newReplies += updatedReply
+                    }
+                } else {
+                    newReplies += origReply
+                }
+            }
+            return if (found) {
+                (parentComment as CommentImpl).copy(replies = newReplies)
+            } else {
+                parentComment
+            }
+        }
+    }
+}

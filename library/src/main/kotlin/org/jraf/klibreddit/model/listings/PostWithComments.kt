@@ -29,4 +29,10 @@ interface PostWithComments {
     val post: Post
     val comments: List<Comment>
     val moreCommentIds: List<String>
+
+    /**
+     * Find the comment in this post's comment tree, and replace it by the given [commentToSearchAndReplace].
+     * @return an updated `PostWithComments` if the comment was actually found and replaced, or this object unaltered, if [commentToSearchAndReplace] was not found.
+     */
+    fun updateComment(commentToSearchAndReplace: Comment): PostWithComments
 }

@@ -131,25 +131,53 @@ fun main(av: Array<String>) {
 //    client.listings.comments("8aqt03")
     client.listings.comments("8c47fe")
         .flatMap(allCommentsRecursively(client))
+        .flatMap(allRepliesRecursively(client))
         .subscribeBy {
             printComments(it.comments)
         }
-
-
 }
 
 private fun allCommentsRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
-    return {
-        if (it.moreCommentIds.isNotEmpty()) {
-            client.listings.moreComments(it)
+    return { postWithComments ->
+        if (postWithComments.moreCommentIds.isNotEmpty()) {
+            client.listings.moreComments(postWithComments)
+                // Recurse
                 .flatMap(allCommentsRecursively(client))
         } else {
-            Single.just(it)
+            Single.just(postWithComments)
         }
     }
 }
 
-fun printComments(
+private fun allRepliesRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
+    return { postWithComments ->
+        val comment = findFirstCommentThatHasMoreReplies(postWithComments.comments)
+        if (comment == null) {
+            Single.just(postWithComments)
+        } else {
+            client.listings.moreComments(comment)
+                .map { postWithComments.updateComment(it) }
+                // Recurse
+                .flatMap(allRepliesRecursively(client))
+        }
+    }
+}
+
+private fun findFirstCommentThatHasMoreReplies(comments: List<Comment>): Comment? {
+    for (comment in comments) {
+        if (comment.moreReplyIds.isNotEmpty()) {
+            return comment
+        } else {
+            // Recurse
+            val found = findFirstCommentThatHasMoreReplies(comment.replies)
+            if (found != null) return found
+        }
+    }
+    return null
+}
+
+
+private fun printComments(
     comments: List<Comment>,
     withReplies: Boolean = true,
     depth: Int = 0
