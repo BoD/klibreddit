@@ -73,6 +73,9 @@ internal data class CommentImpl(
     override val replies: List<Comment>,
     override val moreReplyIds: List<String>
 ) : Comment {
+
+    override val isDeleted = author == "[deleted]"
+
     override fun toString(): String {
         return "\nid: $id\npermalink: $permalink\nbody: $body\n\n"
     }

@@ -26,6 +26,7 @@
 package org.jraf.klibreddit.sample
 
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -36,7 +37,6 @@ import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
 import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
-import java.util.Date
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
@@ -131,25 +131,25 @@ fun main(av: Array<String>) {
 //        }
 
 //    client.listings.comments("8aqt03")
-////    client.listings.comments("8c47fe")
-//        .flatMap(allCommentsRecursively(client))
-//        .flatMap(allRepliesRecursively(client))
-//        .subscribeBy {
-//            printComments(it.comments)
-//        }
-
-
-    client.listings.comments("8aqt03")
-        .doOnSuccess {
+    client.listings.comments("8c47fe")
+        .flatMap(allCommentsRecursively(client))
+        .flatMap(allRepliesRecursively(client))
+        .subscribeBy {
             printComments(it.comments)
         }
-        .map { it.comments.last() }
-        .doOnSuccess {
-            println(repeatString("*", 72))
-            if (it != null) printComments(listOf(it), false)
-        }
-        .flatMapCompletable { client.linksAndComments.comment(it, "This comment was posted on ${Date()}") }
-        .subscribe()
+
+
+//    client.listings.comments("8aqt03")
+//        .doOnSuccess {
+//            printComments(it.comments)
+//        }
+//        .map { it.comments.last() }
+//        .doOnSuccess {
+//            println(repeatString("*", 72))
+//            if (it != null) printComments(listOf(it), false)
+//        }
+//        .flatMapCompletable { client.linksAndComments.comment(it, "This comment was posted on ${Date()}") }
+//        .subscribe()
 }
 
 private fun allCommentsRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {

@@ -48,7 +48,7 @@ internal object ApiPostConverter : ApiConverter<ApiPost, PostImpl> {
         apiModel.hide_score,
         apiModel.num_comments,
         apiModel.num_crossposts,
-        apiModel.selftext,
+        if (apiModel.selftext == "") null else apiModel.selftext,
         apiModel.selftext_html,
         apiModel.thumbnail,
         apiModel.thumbnail_width,

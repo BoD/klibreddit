@@ -62,4 +62,6 @@ interface Comment {
     val depth: Int
     val replies: List<Comment>
     val moreReplyIds: List<String>
+
+    val isDeleted: Boolean
 }
