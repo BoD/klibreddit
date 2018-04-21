@@ -12,7 +12,7 @@ mainClassName = 'org.jraf.klibreddit.sample.SampleKt'
 
 dependencies {
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
     // Rx
     implementation "io.reactivex.rxjava2:rxkotlin:$versions.rxKotlin"
