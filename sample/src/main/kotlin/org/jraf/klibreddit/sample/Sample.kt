@@ -35,103 +35,135 @@ import org.jraf.klibreddit.model.client.HttpLoggingLevel
 import org.jraf.klibreddit.model.client.HttpProxy
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
+import org.jraf.klibreddit.model.listings.FirstPage
+import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.PostWithComments
+import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
+import org.jraf.klibreddit.model.oauth.OAuthScope
+import java.util.Date
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
 const val VERSION = "1.0.0"
-const val AUTHOR_REDDIT_NAME = "bodlulu"
+const val AUTHOR_REDDIT_NAME = "klibreddit"
+
+// 0/ Follow the instructions here to declare your app and get the client id and redirect uri:
+// https://github.com/reddit-archive/reddit/wiki/OAuth2
+// Choose 'Installed App', and then copy/paste the client id and redirect URL to these constants
+const val OAUTH_CLIENT_ID = "YOUR CLIENT ID"
+const val OAUTH_REDIRECT_URI = "YOUR REDIRECT URI"
 
 fun main(av: Array<String>) {
     // Logging
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
 
+    // Create the client
     val client = RedditClient.newRedditClient(
         ClientConfiguration(
             UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
             OAuthConfiguration(
-                System.getenv("OAUTH_CLIENT_ID"),
-                System.getenv("OAUTH_REDIRECT_URI")
+                OAUTH_CLIENT_ID,
+                OAUTH_REDIRECT_URI
             ),
             HttpConfiguration(
                 loggingLevel = HttpLoggingLevel.BASIC,
+                // This is only needed to debug with, e.g., Charles Proxy
                 httpProxy = HttpProxy("localhost", 8888)
             )
         )
     )
 
-//    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
+    // **********************************************************************************************
+    // OAUTH SETUP: ONLY NEEDED ONCE, LINK THE APP WITH YOUR ACCOUNT, AND GET A OAUTH REFRESH TOKEN
+    // **********************************************************************************************
 
-//    client.oAuth.onAuthorizeRedirect("http://jraf.org/klibreddit?state=7c8ff238-212c-4c39-9086-d72849a7e4b9&code=oBoQconTgEboprzSaLmobs89z_Y")
-//        .doOnSuccess { println("Your refresh token is $it") }
-//        .flatMap { client.account.me() }
-//        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+    // 1/ Display the authorize URL
+    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
 
-    client.oAuth.setRefreshToken(System.getenv("OAUTH_REFRESH_TOKEN"))
+    // 2/ Go to the printed URL in your browser, and accept the authorization dialog
+    // You will be redirected to a specific URL.
+    // Copy and paste it to this call
+    client.oAuth.onAuthorizeRedirect("PASTE THE URL HERE")
+        .subscribeBy { println("Your oauth refresh token is: $it") }
+
+    // ************************************************************************
+    // END OF OAUTH SETUP
+    // ************************************************************************
+
+    // 3/ Now that you have the OAuth refresh token, save it somewhere and pass it to this call
+    client.oAuth.setRefreshToken("REPLACE WITH THE OAUTH REFRESH TOKEN YOU GOT IN THE STEPS ABOVE")
 
 
-//    client.account.me()
-//        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
-
-//    client.listings.best(Pagination(FirstPage, 2))
-//        .doOnSuccess { println(it) }
-//        .flatMap { client.listings.best(Pagination(it.nextPageIndex!!, 2)) }
-//        .subscribeBy { println(it) }
+    // Information about yourself
+    client.account.me()
+        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
 
 
-//    // First page of /r/popular
-//    client.listings.top(
-//        subreddit = Subreddits.POPULAR,
-//        pagination = Pagination(FirstPage, 4)
-//    )
-//        .doOnSuccess { println(it) }
-//        .flatMap {
-//            // Second page of /r/popular
-//            client.listings.top(
-//                subreddit = Subreddits.POPULAR,
-//                pagination = it.nextPagination!!
-//            )
-//        }
-//        .doOnSuccess { println(it) }
-//        .flatMap {
-//            // Comments of first post of second page of /r/popular
-//            client.listings.comments(it.list.first().id)
-//        }
-//        // Print the comments
-//        .doOnSuccess { it.comments.forEach { printCommentWithReplies(it) } }
-//        .flatMap {
-//            // Get more comments
-//            client.listings.moreComments(it)
-//        }
-//        // Print the comments (there should be more)
-//        .subscribeBy {
-//            println(repeatString("*", 72))
-//            it.comments.forEach { printCommentWithReplies(it) }
-//        }
+    // Best posts of the subreddits you've subscribed to
+    client.listings.best(Pagination(FirstPage, 2))
+        .doOnSuccess { println(it) }
+        .flatMap { client.listings.best(Pagination(it.nextPageIndex!!, 2)) }
+        .subscribeBy { println(it) }
 
-//    client.listings.comments("8aqt03", itemCount = 10)
-//        .doOnSuccess { printComments(it.comments) }
-//        .flatMap {
-//            client.listings.moreComments(it)
-//        }
-//        .doOnSuccess {
-//            println(repeatString("*", 120))
-//            println()
-//            printComments(it.comments)
-//        }
-//        .subscribe()
-    //        .flatMap {
-//            val firstComment = it.comments.first()
-//            if (firstComment.moreReplyIds.isNotEmpty()) {
-//                client.listings.moreComments(firstComment)
-//            } else {
-//                Single.just(firstComment)
-//            }
-//        }
 
-//    client.listings.comments("8aqt03")
-    client.listings.comments("8c47fe")
+    // First page of /r/popular
+    client.listings.top(
+        subreddit = Subreddits.POPULAR,
+        pagination = Pagination(FirstPage, 4)
+    )
+        .doOnSuccess { println(it) }
+        .flatMap {
+            // Second page of /r/popular
+            client.listings.top(
+                subreddit = Subreddits.POPULAR,
+                pagination = it.nextPagination!!
+            )
+        }
+        .doOnSuccess { println(it) }
+        .flatMap {
+            // Comments of first post of second page of /r/popular
+            client.listings.comments(it.list.first().id)
+        }
+        // Print the comments
+        .doOnSuccess { printComments(it.comments) }
+        .flatMap {
+            // Get more comments
+            client.listings.moreComments(it)
+        }
+        // Print the comments (there should be more)
+        .subscribeBy {
+            println(repeatString("*", 72))
+            printComments(it.comments)
+        }
+
+
+    // Retrieve a specific post with its comments
+    client.listings.comments("8aqt03", itemCount = 10)
+        .doOnSuccess { printComments(it.comments) }
+        .flatMap {
+            // Get more comments
+            client.listings.moreComments(it)
+        }
+        .doOnSuccess {
+            println(repeatString("*", 120))
+            println()
+            printComments(it.comments)
+        }
+        .flatMap {
+            val firstComment = it.comments.first()
+            // Get more replies (if any) for the first comment
+            if (firstComment.moreReplyIds.isNotEmpty()) {
+                client.listings.moreComments(firstComment)
+            } else {
+                Single.just(firstComment)
+            }
+        }
+        .subscribe()
+
+
+    // Recursively get ALL comments of a post
+    client.listings.comments("8aqt03")
         .flatMap(allCommentsRecursively(client))
         .flatMap(allRepliesRecursively(client))
         .subscribeBy {
@@ -139,17 +171,22 @@ fun main(av: Array<String>) {
         }
 
 
-//    client.listings.comments("8aqt03")
-//        .doOnSuccess {
-//            printComments(it.comments)
-//        }
-//        .map { it.comments.last() }
-//        .doOnSuccess {
-//            println(repeatString("*", 72))
-//            if (it != null) printComments(listOf(it), false)
-//        }
-//        .flatMapCompletable { client.linksAndComments.comment(it, "This comment was posted on ${Date()}") }
-//        .subscribe()
+    // Get comments for a specific post
+    client.listings.comments("8aqt03")
+        .doOnSuccess {
+            printComments(it.comments)
+        }
+        // Find the last comment
+        .map { it.comments.last() }
+        .doOnSuccess {
+            println(repeatString("*", 72))
+            if (it != null) printComments(listOf(it), false)
+        }
+        .flatMapCompletable {
+            // Post a reply comment to it
+            client.linksAndComments.comment(it, "This comment was posted on ${Date()}")
+        }
+        .subscribe()
 }
 
 private fun allCommentsRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
