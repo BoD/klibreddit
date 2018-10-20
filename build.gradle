@@ -4,24 +4,18 @@ buildscript {
     // Versions used across modules
     ext.versions = [:]
     ext.versions.with {
-        gradleVersionsPlugin = '0.17.0'
+        gradleVersionsPlugin = '0.20.0'
 
-        kotlin = '1.2.40'
-        rxJava = '2.1.7'
-        rxKotlin = '2.2.0'
+        kotlin = '1.2.71'
+        rxKotlin = '2.3.0'
         junit = '4.12'
-        okHttp = '3.10.0'
-        libFrc = '1.8.0'
-        twitter4j = '4.0.6'
-        forecastIo = '1.6.0'
-        sunriseSunset = '1.1.1'
-        klaxon = '2.1.2'
+        okHttp = '3.11.0'
+        retrofit = '2.4.0'
         json = '20180130'
         slf4j = '1.7.25'
-        retrofit = '2.4.0'
-        gson = '2.8.2'
-        wireMock = '2.17.0'
-        apacheCommonsText = '1.3'
+        gson = '2.8.5'
+        wireMock = '2.19.0'
+        apacheCommonsText = '1.6'
     }
 
     repositories {
@@ -45,14 +39,21 @@ allprojects {
         google()
         jcenter()
     }
+
+    // Show a report in the log when running tests
+    tasks.withType(Test) {
+        testLogging {
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+        }
+    }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+wrapper {
+    gradleVersion = '4.10.2'
     distributionType = Wrapper.DistributionType.ALL
 }
 

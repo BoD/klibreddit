@@ -169,7 +169,7 @@ internal class RedditClientImpl(
 
     private fun ensureAuthToken(): Completable {
         return if (oAuthTokens!!.needsRefresh) {
-            refreshAuthToken().toCompletable()
+            refreshAuthToken().ignoreElement()
         } else {
             Completable.complete()
         }
