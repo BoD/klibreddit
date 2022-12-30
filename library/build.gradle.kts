@@ -10,25 +10,25 @@ repositories {
 
 dependencies {
     // Rx
-    api("io.reactivex.rxjava2:rxjava:2.2.7")
-    implementation("io.reactivex.rxjava2:rxkotlin:2.3.0")
+    api(ReactiveX.rxJava2)
+    implementation(ReactiveX.rxJava2.rxKotlin)
 
     // Json
-    implementation("org.json:json:20180130")
+    implementation("org.json:json:_")
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.5.0")
-    implementation("com.squareup.retrofit2:adapter-rxjava2:2.5.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.5.0")
+    implementation(Square.retrofit2)
+    implementation(Square.retrofit2.adapter.rxJava2)
+    implementation(Square.retrofit2.converter.gson)
 
     // OkHttp
-    implementation("com.squareup.okhttp3:logging-interceptor:3.14.0")
+    implementation(Square.okHttp3.loggingInterceptor)
 
     // Gson
-    implementation("com.google.code.gson:gson:2.8.5")
+    implementation("com.google.code.gson:gson:_")
 
     // Slf4j
-    implementation("org.slf4j:slf4j-api:1.7.26")
+    implementation("org.slf4j:slf4j-api:_")
 
 }
 

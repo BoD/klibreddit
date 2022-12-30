@@ -9,13 +9,13 @@ repositories {
 
 dependencies {
     // Rx
-    implementation("io.reactivex.rxjava2:rxkotlin:2.3.0")
+    implementation(ReactiveX.rxJava2.rxKotlin)
 
     // Slf4j
-    implementation("org.slf4j:slf4j-api:1.7.26")
+    implementation("org.slf4j:slf4j-api:_")
 
     // Commons text
-    implementation("org.apache.commons:commons-text:1.6")
+    implementation("org.apache.commons:commons-text:_")
 
     // Library
     implementation(project(":library"))

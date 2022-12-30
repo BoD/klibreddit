@@ -54,7 +54,7 @@ const val AUTHOR_REDDIT_NAME = "klibreddit"
 const val OAUTH_CLIENT_ID = "YOUR CLIENT ID"
 const val OAUTH_REDIRECT_URI = "YOUR REDIRECT URI"
 
-fun main(av: Array<String>) {
+fun main() {
     // Logging
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
 

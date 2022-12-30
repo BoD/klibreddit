@@ -61,7 +61,7 @@ internal object OkHttpHelper {
                             header(HEADER_AUTHORIZATION, "$BEARER ${authTokenProvider.authToken ?: "-"}")
                         }
 
-                        val urlBuilder = request.url().newBuilder()
+                        val urlBuilder = request.url.newBuilder()
 
                         // Use mock server, if configured
                         clientConfiguration.httpConfiguration.mockServerBaserUri?.let {
@@ -85,7 +85,7 @@ internal object OkHttpHelper {
 
             // Authenticator
             .authenticator { _, response ->
-                val request = response.request()
+                val request = response.request
                 val newAuthToken = authTokenProvider.refreshAuthToken()
                     .blockingGet()
                 request.newBuilder()
