@@ -25,6 +25,9 @@
 
 package org.jraf.klibreddit.internal.api.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 internal data class ApiAccessTokenResult(
     val access_token: String,
     val refresh_token: String?,

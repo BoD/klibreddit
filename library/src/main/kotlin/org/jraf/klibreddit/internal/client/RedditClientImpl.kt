@@ -25,21 +25,14 @@
 
 package org.jraf.klibreddit.internal.client
 
-import com.google.gson.GsonBuilder
 import okhttp3.Credentials
 import org.jraf.klibreddit.client.RedditClient
-import org.jraf.klibreddit.internal.api.OkHttpHelper
+import org.jraf.klibreddit.internal.api.HttpClientHelper
 import org.jraf.klibreddit.internal.api.RedditService
 import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API_V1
-import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_OAUTH
 import org.jraf.klibreddit.internal.api.model.account.ApiMeConverter
-import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrMore
 import org.jraf.klibreddit.internal.api.model.listings.ApiJsonDataCommentOrMoreConverter
-import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalDate
-import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalInt
-import org.jraf.klibreddit.internal.api.model.listings.ApiOptionalMeta
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
-import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMore
 import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMoreListConverter
 import org.jraf.klibreddit.internal.model.listings.CommentImpl
 import org.jraf.klibreddit.internal.model.listings.PostWithCommentsImpl
@@ -57,8 +50,6 @@ import org.jraf.klibreddit.model.listings.Period
 import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthScope
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.net.URI
 import java.util.Date
 import java.util.Locale
@@ -73,7 +64,7 @@ internal class RedditClientImpl(
     RedditClient.Account,
     RedditClient.Listings,
     RedditClient.LinksAndComments,
-    OkHttpHelper.AuthTokenProvider {
+    HttpClientHelper.AuthTokenProvider {
 
     companion object {
         private const val URL_AUTHORIZE =
@@ -96,23 +87,32 @@ internal class RedditClientImpl(
     override val authToken: String?
         get() = oAuthTokens?.accessToken
 
+//    private val service: RedditService by lazy {
+//        Retrofit.Builder()
+//            .baseUrl(URL_BASE_OAUTH)
+//            .addConverterFactory(
+//                GsonConverterFactory.create(
+//                    GsonBuilder()
+//                        .registerTypeAdapter(ApiOptionalDate::class.java, ApiOptionalDate.Deserializer)
+//                        .registerTypeAdapter(ApiCommentOrMore::class.java, ApiCommentOrMore.Deserializer)
+//                        .registerTypeAdapter(ApiPostOrCommentOrMore::class.java, ApiPostOrCommentOrMore.Deserializer)
+//                        .registerTypeAdapter(ApiOptionalMeta::class.java, ApiOptionalMeta.Deserializer)
+//                        .registerTypeAdapter(ApiOptionalInt::class.java, ApiOptionalInt.Deserializer)
+//                        .create()
+//                )
+//            )
+//            .client(HttpClientHelper.provideHttpClient(clientConfiguration, this))
+//            .build()
+//            .create(RedditService::class.java)
+//    }
+
     private val service: RedditService by lazy {
-        Retrofit.Builder()
-            .baseUrl(URL_BASE_OAUTH)
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder()
-                        .registerTypeAdapter(ApiOptionalDate::class.java, ApiOptionalDate.Deserializer)
-                        .registerTypeAdapter(ApiCommentOrMore::class.java, ApiCommentOrMore.Deserializer)
-                        .registerTypeAdapter(ApiPostOrCommentOrMore::class.java, ApiPostOrCommentOrMore.Deserializer)
-                        .registerTypeAdapter(ApiOptionalMeta::class.java, ApiOptionalMeta.Deserializer)
-                        .registerTypeAdapter(ApiOptionalInt::class.java, ApiOptionalInt.Deserializer)
-                        .create()
-                )
+        RedditService(
+            HttpClientHelper.provideHttpClient(
+                clientConfiguration,
+                this
             )
-            .client(OkHttpHelper.provideOkHttpClient(clientConfiguration, this))
-            .build()
-            .create(RedditService::class.java)
+        )
     }
 
     override fun getAuthorizeUrl(vararg scopes: OAuthScope) = URL_AUTHORIZE.format(

@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization")
     id("java-library")
     id("maven-publish")
 }
@@ -17,6 +18,16 @@ dependencies {
     // Retrofit
     implementation(Square.retrofit2)
     implementation(Square.retrofit2.converter.gson)
+
+    // Ktor
+    implementation(Ktor.client.core)
+    implementation(Ktor.client.contentNegotiation)
+    implementation(Ktor.client.auth)
+    implementation(Ktor.client.logging)
+    implementation(Ktor.plugins.serialization.kotlinx.json)
+    implementation(KotlinX.serialization.json)
+
+    implementation(Ktor.client.okHttp)
 
     // OkHttp
     implementation(Square.okHttp3.loggingInterceptor)

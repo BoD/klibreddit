@@ -9,7 +9,7 @@ repositories {
 
 dependencies {
     // Slf4j
-    implementation("org.slf4j:slf4j-api:_")
+    implementation("org.slf4j:slf4j-simple:_")
 
     // Commons text
     implementation("org.apache.commons:commons-text:_")

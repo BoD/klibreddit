@@ -25,6 +25,12 @@
 
 package org.jraf.klibreddit.internal.api
 
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.http.Parameters
 import org.jraf.klibreddit.internal.api.model.ApiAccessTokenResult
 import org.jraf.klibreddit.internal.api.model.account.ApiMe
 import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrMore
@@ -41,7 +47,9 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-internal interface RedditService {
+internal class RedditService(
+    private val httpClient: HttpClient
+) {
     companion object {
         private const val PATH_API = "api"
         private const val PATH_API_V1 = "$PATH_API/v1"
@@ -56,7 +64,18 @@ internal interface RedditService {
         @Field("code") code: String,
         @Field("redirect_uri") redirectUri: String,
         @Header("Authorization") authorizationHeader: String
-    ): ApiAccessTokenResult
+    ): ApiAccessTokenResult {
+        return httpClient.submitForm("$URL_BASE_API_V1/access_token",
+            formParameters = Parameters.build {
+                append("grant_type", grantType)
+                append("code", code)
+                append("redirect_uri", redirectUri)
+            }
+        ) {
+            headers.append("Authorization", authorizationHeader)
+        }
+            .body()
+    }
 
     @POST("$URL_BASE_API_V1/access_token")
     @FormUrlEncoded
@@ -64,18 +83,37 @@ internal interface RedditService {
         @Field("grant_type") grantType: String,
         @Field("refresh_token") refreshToken: String,
         @Header("Authorization") authorizationHeader: String
-    ): ApiAccessTokenResult
-
+    ): ApiAccessTokenResult {
+        return httpClient.submitForm("$URL_BASE_API_V1/access_token",
+            formParameters = Parameters.build {
+                append("grant_type", grantType)
+                append("refresh_token", refreshToken)
+            }
+        ) {
+            headers.append("Authorization", authorizationHeader)
+        }
+            .body()
+    }
 
     @GET("$PATH_API_V1/me")
-    suspend fun me(): ApiMe
+    suspend fun me(): ApiMe {
+        return httpClient.get("$URL_BASE_OAUTH/api/v1/me")
+            .body()
+    }
 
     @GET("best")
     suspend fun best(
         @Query("before") before: String?,
         @Query("after") after: String?,
         @Query("limit") limit: Int
-    ): ApiMeta<ApiList<ApiMeta<ApiPost>>>
+    ): ApiMeta<ApiList<ApiMeta<ApiPost>>> {
+        return httpClient.get("$URL_BASE_OAUTH/best") {
+            parameter("before", before)
+            parameter("after", after)
+            parameter("limit", limit)
+        }
+            .body()
+    }
 
     @GET("{subreddit}/{order}")
     suspend fun subredditPostsOrdered(
@@ -85,7 +123,15 @@ internal interface RedditService {
         @Query("before") before: String?,
         @Query("after") after: String?,
         @Query("limit") limit: Int
-    ): ApiMeta<ApiList<ApiMeta<ApiPost>>>
+    ): ApiMeta<ApiList<ApiMeta<ApiPost>>> {
+        return httpClient.get("$URL_BASE_OAUTH/$subreddit/$order") {
+            parameter("t", t)
+            parameter("before", before)
+            parameter("after", after)
+            parameter("limit", limit)
+        }
+            .body()
+    }
 
     @GET("comments/{postId}")
     suspend fun comments(
@@ -93,18 +139,40 @@ internal interface RedditService {
         @Query("order") order: String?,
         @Query("limit") limit: Int?,
         @Query("truncate") truncate: Int?
-    ): List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>
+    ): List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>> {
+        return httpClient.get("$URL_BASE_OAUTH/comments/$postId") {
+            parameter("order", order)
+            parameter("limit", limit)
+            parameter("truncate", truncate)
+        }
+            .body()
+    }
 
     @GET("$PATH_API/morechildren?api_type=json")
     suspend fun morechildren(
         @Query("children") children: String,
         @Query("link_id") link_id: String
-    ): ApiJsonEnvelope<ApiCommentOrMore>
+    ): ApiJsonEnvelope<ApiCommentOrMore> {
+        return httpClient.get("$URL_BASE_OAUTH/api/morechildren") {
+            parameter("api_type", "json")
+            parameter("children", children)
+            parameter("link_id", link_id)
+        }
+            .body()
+    }
 
     @POST("$PATH_API/comment?api_type=json")
     @FormUrlEncoded
     suspend fun comment(
         @Field("thing_id") thing_id: String,
         @Field("text") text: String
-    )
+    ) {
+        httpClient.submitForm(
+            url = "$URL_BASE_OAUTH/api/comment?api_type=json",
+            formParameters = Parameters.build {
+                append("thing_id", thing_id)
+                append("text", text)
+            }
+        )
+    }
 }

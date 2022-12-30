@@ -25,6 +25,9 @@
 
 package org.jraf.klibreddit.internal.api.model.account
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 internal data class ApiMe(
     val is_employee: Boolean,
     val has_visited_new_profile: Boolean,
