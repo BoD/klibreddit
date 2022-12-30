@@ -25,22 +25,15 @@
 
 package org.jraf.klibreddit.sample
 
-import io.reactivex.Single
-import io.reactivex.rxkotlin.subscribeBy
 import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.client.HttpConfiguration
 import org.jraf.klibreddit.model.client.HttpLoggingLevel
-import org.jraf.klibreddit.model.client.HttpProxy
 import org.jraf.klibreddit.model.client.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
-import org.jraf.klibreddit.model.listings.FirstPage
-import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.PostWithComments
-import org.jraf.klibreddit.model.listings.Subreddits
 import org.jraf.klibreddit.model.oauth.OAuthConfiguration
-import org.jraf.klibreddit.model.oauth.OAuthScope
 import java.util.Date
 
 const val PLATFORM = "cli"
@@ -51,10 +44,10 @@ const val AUTHOR_REDDIT_NAME = "klibreddit"
 // 0/ Follow the instructions here to declare your app and get the client id and redirect uri:
 // https://github.com/reddit-archive/reddit/wiki/OAuth2
 // Choose 'Installed App', and then copy/paste the client id and redirect URL to these constants
-const val OAUTH_CLIENT_ID = "YOUR CLIENT ID"
-const val OAUTH_REDIRECT_URI = "YOUR REDIRECT URI"
+const val OAUTH_CLIENT_ID = "VpcPbMjFbdpWdsHPqB9lFA"
+const val OAUTH_REDIRECT_URI = "https://google.com"
 
-fun main() {
+suspend fun main() {
     // Logging
     System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
 
@@ -69,7 +62,7 @@ fun main() {
             HttpConfiguration(
                 loggingLevel = HttpLoggingLevel.BASIC,
                 // This is only needed to debug with, e.g., Charles Proxy
-                httpProxy = HttpProxy("localhost", 8888)
+//                httpProxy = HttpProxy("localhost", 8888)
             )
         )
     )
@@ -78,142 +71,116 @@ fun main() {
     // OAUTH SETUP: ONLY NEEDED ONCE, LINK THE APP WITH YOUR ACCOUNT, AND GET A OAUTH REFRESH TOKEN
     // **********************************************************************************************
 
-    // 1/ Display the authorize URL
-    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
-
-    // 2/ Go to the printed URL in your browser, and accept the authorization dialog
-    // You will be redirected to a specific URL.
-    // Copy and paste it to this call
-    client.oAuth.onAuthorizeRedirect("PASTE THE URL HERE")
-        .subscribeBy { println("Your oauth refresh token is: $it") }
+//    // 1/ Display the authorize URL
+//    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
+//
+//    // 2/ Go to the printed URL in your browser, and accept the authorization dialog
+//    // You will be redirected to a specific URL.
+//    // Copy and paste it to this call
+//    client.oAuth.onAuthorizeRedirect("https://www.google.com/?state=a0180c5a-fe72-4451-95fd-ac7253a7f2d5&code=yU5GrubQWwUNroPY66TsvSuygxhKbw#_")
+//        .subscribeBy { println("Your oauth refresh token is: $it") }
 
     // ************************************************************************
     // END OF OAUTH SETUP
     // ************************************************************************
 
     // 3/ Now that you have the OAuth refresh token, save it somewhere and pass it to this call
-    client.oAuth.setRefreshToken("REPLACE WITH THE OAUTH REFRESH TOKEN YOU GOT IN THE STEPS ABOVE")
+    client.oAuth.setRefreshToken("993811510915-wv0PDG8xgEuApEf1OhuCNZlq4ChqSA")
 
 
     // Information about yourself
-    client.account.me()
-        .subscribeBy { println("id: ${it.id} name: ${it.name} created: ${it.created}") }
+//    val me = client.account.me()
+//    println("id: ${me.id} name: ${me.name} created: ${me.created}")
+//
+//    // Best posts of the subreddits you've subscribed to
+//    val bestPostsFirstPage = client.listings.best(Pagination(FirstPage, 2))
+//    println(bestPostsFirstPage)
+//    val bestPostsSecondPage = client.listings.best(Pagination(bestPostsFirstPage.nextPageIndex!!, 2))
+//    println(bestPostsSecondPage)
+//
+//    // First page of /r/popular
+//    val popularFirstPage = client.listings.top(
+//        subreddit = Subreddits.POPULAR,
+//        pagination = Pagination(FirstPage, 4)
+//    )
+//    println(popularFirstPage)
+//
+//    // Second page of /r/popular
+//    val popularSecondPage = client.listings.top(
+//        subreddit = Subreddits.POPULAR,
+//        pagination = popularFirstPage.nextPagination!!
+//    )
+//    println(popularSecondPage)
+//
+//    // Comments of first post of second page of /r/popular
+//    val popularSecondPageComments = client.listings.comments(popularSecondPage.list.first().id)
+//    printComments(popularSecondPageComments.comments)
+//
+//    // Get more comments
+//    val popularSecondPageMoreComments = client.listings.moreComments(popularSecondPageComments)
+//    println("*".repeat(72))
+//    printComments(popularSecondPageMoreComments.comments)
+//
+//
+//    // Retrieve a specific post with its comments
+//    val specificPostAndComments = client.listings.comments("8aqt03", itemCount = 10)
+//    printComments(specificPostAndComments.comments)
+//    // Get more comments
+//    val specificPostMoreComments = client.listings.moreComments(specificPostAndComments)
+//
+//    println("*".repeat(120))
+//    println()
+//    printComments(specificPostMoreComments.comments)
+//
+//    val firstComment = specificPostMoreComments.comments.first()
+//    // Get more replies (if any) for the first comment
+//    if (firstComment.moreReplyIds.isNotEmpty()) {
+//        println(client.listings.moreComments(firstComment))
+//    }
 
 
-    // Best posts of the subreddits you've subscribed to
-    client.listings.best(Pagination(FirstPage, 2))
-        .doOnSuccess { println(it) }
-        .flatMap { client.listings.best(Pagination(it.nextPageIndex!!, 2)) }
-        .subscribeBy { println(it) }
-
-
-    // First page of /r/popular
-    client.listings.top(
-        subreddit = Subreddits.POPULAR,
-        pagination = Pagination(FirstPage, 4)
-    )
-        .doOnSuccess { println(it) }
-        .flatMap {
-            // Second page of /r/popular
-            client.listings.top(
-                subreddit = Subreddits.POPULAR,
-                pagination = it.nextPagination!!
-            )
-        }
-        .doOnSuccess { println(it) }
-        .flatMap {
-            // Comments of first post of second page of /r/popular
-            client.listings.comments(it.list.first().id)
-        }
-        // Print the comments
-        .doOnSuccess { printComments(it.comments) }
-        .flatMap {
-            // Get more comments
-            client.listings.moreComments(it)
-        }
-        // Print the comments (there should be more)
-        .subscribeBy {
-            println(repeatString("*", 72))
-            printComments(it.comments)
-        }
-
-
-    // Retrieve a specific post with its comments
-    client.listings.comments("8aqt03", itemCount = 10)
-        .doOnSuccess { printComments(it.comments) }
-        .flatMap {
-            // Get more comments
-            client.listings.moreComments(it)
-        }
-        .doOnSuccess {
-            println(repeatString("*", 120))
-            println()
-            printComments(it.comments)
-        }
-        .flatMap {
-            val firstComment = it.comments.first()
-            // Get more replies (if any) for the first comment
-            if (firstComment.moreReplyIds.isNotEmpty()) {
-                client.listings.moreComments(firstComment)
-            } else {
-                Single.just(firstComment)
-            }
-        }
-        .subscribe()
-
-
-    // Recursively get ALL comments of a post
-    client.listings.comments("8aqt03")
-        .flatMap(allCommentsRecursively(client))
-        .flatMap(allRepliesRecursively(client))
-        .subscribeBy {
-            printComments(it.comments)
-        }
-
+//    // Recursively get ALL comments of a post
+//    val comments = client.listings.comments("8aqt03")
+//    val allCommentsRecursively = comments.allCommentsRecursively(client)
+//    printComments(allCommentsRecursively.comments)
 
     // Get comments for a specific post
-    client.listings.comments("8aqt03")
-        .doOnSuccess {
-            printComments(it.comments)
-        }
-        // Find the last comment
-        .map { it.comments.last() }
-        .doOnSuccess {
-            println(repeatString("*", 72))
-            if (it != null) printComments(listOf(it), false)
-        }
-        .flatMapCompletable {
-            // Post a reply comment to it
-            client.linksAndComments.comment(it, "This comment was posted on ${Date()}")
-        }
-        .subscribe()
+    val comments2 = client.listings.comments("8aqt03")
+    printComments(comments2.comments)
+    // Find the last comment
+    val lastComment = comments2.comments.last()
+    println("*".repeat(72))
+    printComments(listOf(lastComment), false)
+
+    // Post a reply comment to it
+    client.linksAndComments.comment(lastComment, "This comment was posted on ${Date()}")
 }
 
-private fun allCommentsRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
-    return { postWithComments ->
-        if (postWithComments.moreCommentIds.isNotEmpty()) {
-            client.listings.moreComments(postWithComments)
-                // Recurse
-                .flatMap(allCommentsRecursively(client))
-        } else {
-            Single.just(postWithComments)
-        }
+private suspend fun PostWithComments.allCommentsRecursively(client: RedditClient): PostWithComments {
+    return if (moreCommentIds.isNotEmpty()) {
+        client.listings.moreComments(this)
+            // Recurse
+            .allCommentsRecursively(client)
+    } else {
+        this
     }
 }
 
-private fun allRepliesRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
-    return { postWithComments ->
-        val comment = findFirstCommentThatHasMoreReplies(postWithComments.comments)
-        if (comment == null) {
-            Single.just(postWithComments)
-        } else {
-            client.listings.moreComments(comment)
-                .map { postWithComments.updateComment(it) }
-                // Recurse
-                .flatMap(allRepliesRecursively(client))
-        }
-    }
-}
+
+//
+//private fun allRepliesRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
+//    return { postWithComments ->
+//        val comment = findFirstCommentThatHasMoreReplies(postWithComments.comments)
+//        if (comment == null) {
+//            Single.just(postWithComments)
+//        } else {
+//            client.listings.moreComments(comment)
+//                .map { postWithComments.updateComment(it) }
+//                // Recurse
+//                .flatMap(allRepliesRecursively(client))
+//        }
+//    }
+//}
 
 private fun findFirstCommentThatHasMoreReplies(comments: List<Comment>): Comment? {
     for (comment in comments) {
@@ -234,8 +201,8 @@ private fun printComments(
     withReplies: Boolean = true,
     depth: Int = 0
 ) {
-    val indent = repeatString("    ", depth)
-    val separator = repeatString("─", 72)
+    val indent = "    ".repeat(depth)
+    val separator = "─".repeat(72)
     for (comment in comments) {
         println("$indent╭$separator")
         println("${indent}│Author: ${comment.author}")
@@ -255,13 +222,8 @@ private fun printComments(
     }
 }
 
-private fun repeatString(s: String, times: Int): String {
-    var res = ""
-    for (i in 0 until times) res += s
-    return res
-}
-
 private fun String.wrapAndIndent(wrapSize: Int, indent: String): String {
     val wrapped = WordUtils.wrap(this, wrapSize)
     return "│" + wrapped.trimEnd().replace("\n", "\n$indent│")
 }
+

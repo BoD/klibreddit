@@ -25,7 +25,7 @@
 
 package org.jraf.klibreddit.internal.api
 
-import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -86,8 +86,7 @@ internal object OkHttpHelper {
             // Authenticator
             .authenticator { _, response ->
                 val request = response.request
-                val newAuthToken = authTokenProvider.refreshAuthToken()
-                    .blockingGet()
+                val newAuthToken = runBlocking { authTokenProvider.refreshAuthToken() }
                 request.newBuilder()
                     .header(HEADER_AUTHORIZATION, "$BEARER $newAuthToken")
                     .build()
@@ -108,6 +107,6 @@ internal object OkHttpHelper {
 
     interface AuthTokenProvider {
         val authToken: String?
-        fun refreshAuthToken(): Single<String>
+        suspend fun refreshAuthToken(): String
     }
 }

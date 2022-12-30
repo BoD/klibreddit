@@ -25,8 +25,6 @@
 
 package org.jraf.klibreddit.client
 
-import io.reactivex.Completable
-import io.reactivex.Single
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
 import org.jraf.klibreddit.model.client.ClientConfiguration
@@ -47,88 +45,88 @@ interface RedditClient {
 
     interface OAuth {
         fun getAuthorizeUrl(vararg scopes: OAuthScope): String
-        fun onAuthorizeRedirect(authorizeRedirectUri: String): Single<String>
+        suspend fun onAuthorizeRedirect(authorizeRedirectUri: String): String
         fun setRefreshToken(refreshToken: String)
     }
 
     interface Account {
-        fun me(): Single<Me>
+        suspend fun me(): Me
     }
 
     interface Listings {
         /**
          * Retrieve the best posts of the subreddits you've subscribed to.
          */
-        fun best(pagination: Pagination = Pagination(FirstPage)): Single<Page<Post>>
+        suspend fun best(pagination: Pagination = Pagination(FirstPage)): Page<Post>
 
         /**
          * Retrieve the hot posts of all the subreddits you've subscribed to, or a specific subreddit.
          */
-        fun hot(
+        suspend fun hot(
             subreddit: String? = null,
             pagination: Pagination = Pagination(FirstPage)
-        ): Single<Page<Post>>
+        ): Page<Post>
 
         /**
          * Retrieve the new posts of all the subreddits you've subscribed to, or a specific subreddit.
          */
-        fun new(
+        suspend fun new(
             subreddit: String? = null,
             pagination: Pagination = Pagination(FirstPage)
-        ): Single<Page<Post>>
+        ): Page<Post>
 
         /**
          * Retrieve the rising posts of all the subreddits you've subscribed to, or a specific subreddit.
          */
-        fun rising(
+        suspend fun rising(
             subreddit: String? = null,
             pagination: Pagination = Pagination(FirstPage)
-        ): Single<Page<Post>>
+        ): Page<Post>
 
         /**
          * Retrieve the controversial posts of all the subreddits you've subscribed to, or a specific subreddit.
          */
-        fun controversial(
+        suspend fun controversial(
             subreddit: String? = null,
             period: Period = Period.ALL,
             pagination: Pagination = Pagination(FirstPage)
-        ): Single<Page<Post>>
+        ): Page<Post>
 
         /**
          * Retrieve the top posts of all the subreddits you've subscribed to, or a specific subreddit.
          */
-        fun top(
+        suspend fun top(
             subreddit: String? = null,
             period: Period = Period.ALL,
             pagination: Pagination = Pagination(FirstPage)
-        ): Single<Page<Post>>
+        ): Page<Post>
 
         /**
          * Retrieve the post [postId] with its comments.
          */
-        fun comments(
+        suspend fun comments(
             postId: String,
             order: CommentListOrder = CommentListOrder.CONFIDENCE,
             itemCount: Int? = null,
             maxDepth: Int? = null
-        ): Single<PostWithComments>
+        ): PostWithComments
 
         /**
          * Retrieve more comments for the given post with comments.
          */
-        fun moreComments(postWithComments: PostWithComments): Single<PostWithComments>
+        suspend fun moreComments(postWithComments: PostWithComments): PostWithComments
 
         /**
          * Retrieve more reply comments for the given comment.
          */
-        fun moreComments(comment: Comment): Single<Comment>
+        suspend fun moreComments(comment: Comment): Comment
     }
 
     interface LinksAndComments {
         /**
          * Post a reply to a comment.
          */
-        fun comment(comment: Comment, text: String): Completable
+        suspend fun comment(comment: Comment, text: String)
     }
 
 

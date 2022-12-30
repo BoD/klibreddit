@@ -8,9 +8,6 @@ repositories {
 }
 
 dependencies {
-    // Rx
-    implementation(ReactiveX.rxJava2.rxKotlin)
-
     // Slf4j
     implementation("org.slf4j:slf4j-api:_")
 

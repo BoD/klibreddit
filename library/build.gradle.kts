@@ -9,16 +9,13 @@ repositories {
 }
 
 dependencies {
-    // Rx
-    api(ReactiveX.rxJava2)
-    implementation(ReactiveX.rxJava2.rxKotlin)
+    implementation(KotlinX.coroutines.jdk9)
 
     // Json
     implementation("org.json:json:_")
 
     // Retrofit
     implementation(Square.retrofit2)
-    implementation(Square.retrofit2.adapter.rxJava2)
     implementation(Square.retrofit2.converter.gson)
 
     // OkHttp

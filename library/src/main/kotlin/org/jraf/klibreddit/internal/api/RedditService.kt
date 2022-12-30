@@ -25,8 +25,6 @@
 
 package org.jraf.klibreddit.internal.api
 
-import io.reactivex.Completable
-import io.reactivex.Single
 import org.jraf.klibreddit.internal.api.model.ApiAccessTokenResult
 import org.jraf.klibreddit.internal.api.model.account.ApiMe
 import org.jraf.klibreddit.internal.api.model.listings.ApiCommentOrMore
@@ -53,60 +51,60 @@ internal interface RedditService {
 
     @POST("$URL_BASE_API_V1/access_token")
     @FormUrlEncoded
-    fun accessToken(
+    suspend fun accessToken(
         @Field("grant_type") grantType: String,
         @Field("code") code: String,
         @Field("redirect_uri") redirectUri: String,
         @Header("Authorization") authorizationHeader: String
-    ): Single<ApiAccessTokenResult>
+    ): ApiAccessTokenResult
 
     @POST("$URL_BASE_API_V1/access_token")
     @FormUrlEncoded
-    fun refreshToken(
+    suspend fun refreshToken(
         @Field("grant_type") grantType: String,
         @Field("refresh_token") refreshToken: String,
         @Header("Authorization") authorizationHeader: String
-    ): Single<ApiAccessTokenResult>
+    ): ApiAccessTokenResult
 
 
     @GET("$PATH_API_V1/me")
-    fun me(): Single<ApiMe>
+    suspend fun me(): ApiMe
 
     @GET("best")
-    fun best(
+    suspend fun best(
         @Query("before") before: String?,
         @Query("after") after: String?,
         @Query("limit") limit: Int
-    ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
+    ): ApiMeta<ApiList<ApiMeta<ApiPost>>>
 
     @GET("{subreddit}/{order}")
-    fun subredditPostsOrdered(
+    suspend fun subredditPostsOrdered(
         @Path("subreddit", encoded = true) subreddit: String?,
         @Path("order") order: String,
         @Query("t") t: String?,
         @Query("before") before: String?,
         @Query("after") after: String?,
         @Query("limit") limit: Int
-    ): Single<ApiMeta<ApiList<ApiMeta<ApiPost>>>>
+    ): ApiMeta<ApiList<ApiMeta<ApiPost>>>
 
     @GET("comments/{postId}")
-    fun comments(
+    suspend fun comments(
         @Path("postId") postId: String,
         @Query("order") order: String?,
         @Query("limit") limit: Int?,
         @Query("truncate") truncate: Int?
-    ): Single<List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>>
+    ): List<ApiMeta<ApiList<ApiPostOrCommentOrMore>>>
 
     @GET("$PATH_API/morechildren?api_type=json")
-    fun morechildren(
+    suspend fun morechildren(
         @Query("children") children: String,
         @Query("link_id") link_id: String
-    ): Single<ApiJsonEnvelope<ApiCommentOrMore>>
+    ): ApiJsonEnvelope<ApiCommentOrMore>
 
     @POST("$PATH_API/comment?api_type=json")
     @FormUrlEncoded
-    fun comment(
+    suspend fun comment(
         @Field("thing_id") thing_id: String,
         @Field("text") text: String
-    ): Completable
+    )
 }

@@ -26,8 +26,6 @@
 package org.jraf.klibreddit.internal.client
 
 import com.google.gson.GsonBuilder
-import io.reactivex.Completable
-import io.reactivex.Single
 import okhttp3.Credentials
 import org.jraf.klibreddit.client.RedditClient
 import org.jraf.klibreddit.internal.api.OkHttpHelper
@@ -60,7 +58,6 @@ import org.jraf.klibreddit.model.listings.Post
 import org.jraf.klibreddit.model.listings.PostWithComments
 import org.jraf.klibreddit.model.oauth.OAuthScope
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.URI
 import java.util.Date
@@ -102,7 +99,6 @@ internal class RedditClientImpl(
     private val service: RedditService by lazy {
         Retrofit.Builder()
             .baseUrl(URL_BASE_OAUTH)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(
                 GsonConverterFactory.create(
                     GsonBuilder()
@@ -124,59 +120,55 @@ internal class RedditClientImpl(
         clientConfiguration.oAuthConfiguration.clientId.toUrlEncoded(),
         UUID.randomUUID().toString().toUrlEncoded(),
         clientConfiguration.oAuthConfiguration.redirectUri.toUrlEncoded(),
-        scopes.joinToString(",") { it.name.toLowerCase(Locale.US) }.toUrlEncoded()
+        scopes.joinToString(",") { it.name.lowercase(Locale.US) }.toUrlEncoded()
     )
 
-    override fun onAuthorizeRedirect(authorizeRedirectUri: String): Single<String> {
+    override suspend fun onAuthorizeRedirect(authorizeRedirectUri: String): String {
         val code = URI(authorizeRedirectUri).queryParams[AUTHORIZE_REDIRECT_PARAM_CODE]
                 ?: throw IllegalArgumentException("Invalid format for authorizeRedirectUri")
 
-        return service.accessToken(
+        val accessTokenResult = service.accessToken(
             grantType = GRANT_TYPE_AUTHORIZE,
             code = code,
             redirectUri = clientConfiguration.oAuthConfiguration.redirectUri,
             authorizationHeader = Credentials.basic(clientConfiguration.oAuthConfiguration.clientId, "")
         )
-            .doOnSuccess {
-                oAuthTokens = OAuthTokens(
-                    it.access_token,
-                    Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(it.expires_in.toLong())),
-                    it.refresh_token!!
-                )
-            }
-            .map { it.refresh_token }
+        oAuthTokens = OAuthTokens(
+            accessTokenResult.access_token,
+            Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(accessTokenResult.expires_in.toLong())),
+            accessTokenResult.refresh_token!!
+        )
+        return accessTokenResult.refresh_token
     }
 
-    override fun refreshAuthToken(): Single<String> {
-        return service.refreshToken(
+    override suspend fun refreshAuthToken(): String {
+        val accessTokenResult = service.refreshToken(
             grantType = GRANT_REFRESH_TOKEN,
             refreshToken = oAuthTokens!!.refreshToken,
             authorizationHeader = Credentials.basic(clientConfiguration.oAuthConfiguration.clientId, "")
         )
-            .doOnSuccess {
-                oAuthTokens = OAuthTokens(
-                    it.access_token,
-                    Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(it.expires_in.toLong())),
-                    oAuthTokens!!.refreshToken
-                )
-            }
-            .map { it.access_token }
+        oAuthTokens = OAuthTokens(
+            accessTokenResult.access_token,
+            Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(accessTokenResult.expires_in.toLong())),
+            oAuthTokens!!.refreshToken
+        )
+        return accessTokenResult.access_token
     }
 
     override fun setRefreshToken(refreshToken: String) {
         oAuthTokens = OAuthTokens(refreshToken = refreshToken)
     }
 
-    private fun ensureAuthToken(): Completable {
-        return if (oAuthTokens!!.needsRefresh) {
-            refreshAuthToken().ignoreElement()
-        } else {
-            Completable.complete()
+    private suspend fun ensureAuthToken() {
+        if (oAuthTokens!!.needsRefresh) {
+            refreshAuthToken()
         }
     }
 
-    private fun <T> call(call: Single<T>): Single<T> = ensureAuthToken().andThen(call)
-    private fun call(call: Completable): Completable = ensureAuthToken().andThen(call)
+    private suspend fun <T> call(call: suspend () -> T): T {
+        ensureAuthToken()
+        return call()
+    }
 
     private fun String?.subreddit() = when {
         this == null -> ""
@@ -188,32 +180,32 @@ internal class RedditClientImpl(
 
     // Account
 
-    override fun me(): Single<Me> {
-        return call(service.me())
-            .map { ApiMeConverter.convert(it) }
+    override suspend fun me(): Me {
+        return call { service.me() }
+            .let { ApiMeConverter.convert(it) }
     }
 
 
     // Listings
 
-    override fun best(pagination: Pagination): Single<Page<Post>> {
-        return call(
+    override suspend fun best(pagination: Pagination): Page<Post> {
+        return call {
             service.best(
                 pagination.pageIndex.before,
                 pagination.pageIndex.after,
                 pagination.itemCount
             )
-        )
-            .map { ApiPostListConverter.convert(it to pagination.itemCount) }
+        }
+            .let { ApiPostListConverter.convert(it to pagination.itemCount) }
     }
 
-    private fun subredditPostsOrdered(
+    private suspend fun subredditPostsOrdered(
         subreddit: String?,
         pagination: Pagination,
         postListOrder: PostListOrder,
         period: Period? = null
-    ): Single<Page<Post>> {
-        return call(
+    ): Page<Post> {
+        return call {
             service.subredditPostsOrdered(
                 subreddit.subreddit(),
                 postListOrder.nameLowerCase,
@@ -222,58 +214,58 @@ internal class RedditClientImpl(
                 pagination.pageIndex.after,
                 pagination.itemCount
             )
-        )
-            .map { ApiPostListConverter.convert(it to pagination.itemCount) }
+        }
+            .let { ApiPostListConverter.convert(it to pagination.itemCount) }
     }
 
-    override fun hot(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
+    override suspend fun hot(subreddit: String?, pagination: Pagination): Page<Post> {
         return subredditPostsOrdered(subreddit, pagination, PostListOrder.HOT)
     }
 
-    override fun new(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
+    override suspend fun new(subreddit: String?, pagination: Pagination): Page<Post> {
         return subredditPostsOrdered(subreddit, pagination, PostListOrder.NEW)
     }
 
-    override fun rising(subreddit: String?, pagination: Pagination): Single<Page<Post>> {
+    override suspend fun rising(subreddit: String?, pagination: Pagination): Page<Post> {
         return subredditPostsOrdered(subreddit, pagination, PostListOrder.RISING)
     }
 
-    override fun controversial(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
+    override suspend fun controversial(subreddit: String?, period: Period, pagination: Pagination): Page<Post> {
         return subredditPostsOrdered(subreddit, pagination, PostListOrder.CONTROVERSIAL, period)
     }
 
-    override fun top(subreddit: String?, period: Period, pagination: Pagination): Single<Page<Post>> {
+    override suspend fun top(subreddit: String?, period: Period, pagination: Pagination): Page<Post> {
         return subredditPostsOrdered(subreddit, pagination, PostListOrder.TOP, period)
     }
 
-    override fun comments(
+    override suspend fun comments(
         postId: String,
         order: CommentListOrder,
         itemCount: Int?,
         maxDepth: Int?
-    ): Single<PostWithComments> {
-        return call(
+    ): PostWithComments {
+        return call {
             service.comments(
                 postId,
                 order.nameLowerCase,
                 itemCount,
                 maxDepth
             )
-        )
-            .map { ApiPostOrCommentOrMoreListConverter.convert(it) }
+        }
+            .let { ApiPostOrCommentOrMoreListConverter.convert(it) }
     }
 
-    override fun moreComments(postWithComments: PostWithComments): Single<PostWithComments> {
-        if (postWithComments.moreCommentIds.isEmpty()) return Single.just(postWithComments)
+    override suspend fun moreComments(postWithComments: PostWithComments): PostWithComments {
+        if (postWithComments.moreCommentIds.isEmpty()) return postWithComments
 
         val moreCommentIds = postWithComments.moreCommentIds.split(MORE_CHILDREN_MAX_IDS)
-        return call(
+        return call {
             service.morechildren(
                 moreCommentIds[0].joinToString(","),
                 postWithComments.post.name
             )
-        )
-            .map {
+        }
+            .let {
                 val comments = postWithComments.comments.toMutableList()
                 comments += ApiJsonDataCommentOrMoreConverter.convert(it)
                 (postWithComments as PostWithCommentsImpl).copy(
@@ -284,17 +276,17 @@ internal class RedditClientImpl(
             }
     }
 
-    override fun moreComments(comment: Comment): Single<Comment> {
-        if (comment.moreReplyIds.isEmpty()) return Single.just(comment)
+    override suspend fun moreComments(comment: Comment): Comment {
+        if (comment.moreReplyIds.isEmpty()) return comment
 
         val moreReplyIds = comment.moreReplyIds.split(MORE_CHILDREN_MAX_IDS)
-        return call(
+        return call {
             service.morechildren(
                 moreReplyIds[0].joinToString(","),
                 comment.linkId
             )
-        )
-            .map {
+        }
+            .let {
                 val replies = comment.replies.toMutableList()
                 replies += ApiJsonDataCommentOrMoreConverter.convert(it)
                 (comment as CommentImpl).copy(
@@ -307,8 +299,8 @@ internal class RedditClientImpl(
 
     // LinksAndComments
 
-    override fun comment(comment: Comment, text: String): Completable {
-        return call(service.comment(comment.name, text))
+    override suspend fun comment(comment: Comment, text: String) {
+        return call { service.comment(comment.name, text) }
     }
 
 }
