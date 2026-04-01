@@ -27,7 +27,7 @@ package org.jraf.klibreddit.client
 
 import org.jraf.klibreddit.internal.client.RedditClientImpl
 import org.jraf.klibreddit.model.account.Me
-import org.jraf.klibreddit.model.client.ClientConfiguration
+import org.jraf.klibreddit.client.configuration.ClientConfiguration
 import org.jraf.klibreddit.model.listings.Comment
 import org.jraf.klibreddit.model.listings.CommentListOrder
 import org.jraf.klibreddit.model.listings.FirstPage

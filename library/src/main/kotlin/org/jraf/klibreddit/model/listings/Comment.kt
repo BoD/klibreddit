@@ -54,7 +54,7 @@ interface Comment {
     val noFollow: Boolean
     val canModPost: Boolean
     val sendReplies: Boolean
-    val edited: Int?
+    val edited: Date?
     val collapsed: Boolean
     val isSubmitter: Boolean
     val stickied: Boolean

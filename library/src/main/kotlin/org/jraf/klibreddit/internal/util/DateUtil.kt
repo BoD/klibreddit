@@ -29,3 +29,4 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 internal fun Double.toDate(): Date = Date(TimeUnit.SECONDS.toMillis(toLong()))
+internal fun Long.toDate(): Date = Date(TimeUnit.SECONDS.toMillis(this))

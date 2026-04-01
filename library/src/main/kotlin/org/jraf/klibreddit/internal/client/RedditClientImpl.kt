@@ -27,13 +27,11 @@ package org.jraf.klibreddit.internal.client
 
 import okhttp3.Credentials
 import org.jraf.klibreddit.client.RedditClient
-import org.jraf.klibreddit.internal.api.HttpClientHelper
-import org.jraf.klibreddit.internal.api.RedditService
-import org.jraf.klibreddit.internal.api.RedditService.Companion.URL_BASE_API_V1
-import org.jraf.klibreddit.internal.api.model.account.ApiMeConverter
-import org.jraf.klibreddit.internal.api.model.listings.ApiJsonDataCommentOrMoreConverter
-import org.jraf.klibreddit.internal.api.model.listings.ApiPostListConverter
-import org.jraf.klibreddit.internal.api.model.listings.ApiPostOrCommentOrMoreListConverter
+import org.jraf.klibreddit.client.configuration.ClientConfiguration
+import org.jraf.klibreddit.internal.client.RedditService.Companion.URL_BASE_API_V1
+import org.jraf.klibreddit.internal.json.listings.JsonCommentOrMoreConverter
+import org.jraf.klibreddit.internal.json.listings.JsonPostListConverter
+import org.jraf.klibreddit.internal.json.listings.JsonPostOrCommentOrMoreListConverter
 import org.jraf.klibreddit.internal.model.listings.CommentImpl
 import org.jraf.klibreddit.internal.model.listings.PostWithCommentsImpl
 import org.jraf.klibreddit.internal.util.nameLowerCase
@@ -41,7 +39,6 @@ import org.jraf.klibreddit.internal.util.queryParams
 import org.jraf.klibreddit.internal.util.split
 import org.jraf.klibreddit.internal.util.toUrlEncoded
 import org.jraf.klibreddit.model.account.Me
-import org.jraf.klibreddit.model.client.ClientConfiguration
 import org.jraf.klibreddit.model.listings.Comment
 import org.jraf.klibreddit.model.listings.CommentListOrder
 import org.jraf.klibreddit.model.listings.Page
@@ -55,7 +52,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-
 
 internal class RedditClientImpl(
     private val clientConfiguration: ClientConfiguration
@@ -86,25 +82,6 @@ internal class RedditClientImpl(
 
     override val authToken: String?
         get() = oAuthTokens?.accessToken
-
-//    private val service: RedditService by lazy {
-//        Retrofit.Builder()
-//            .baseUrl(URL_BASE_OAUTH)
-//            .addConverterFactory(
-//                GsonConverterFactory.create(
-//                    GsonBuilder()
-//                        .registerTypeAdapter(ApiOptionalDate::class.java, ApiOptionalDate.Deserializer)
-//                        .registerTypeAdapter(ApiCommentOrMore::class.java, ApiCommentOrMore.Deserializer)
-//                        .registerTypeAdapter(ApiPostOrCommentOrMore::class.java, ApiPostOrCommentOrMore.Deserializer)
-//                        .registerTypeAdapter(ApiOptionalMeta::class.java, ApiOptionalMeta.Deserializer)
-//                        .registerTypeAdapter(ApiOptionalInt::class.java, ApiOptionalInt.Deserializer)
-//                        .create()
-//                )
-//            )
-//            .client(HttpClientHelper.provideHttpClient(clientConfiguration, this))
-//            .build()
-//            .create(RedditService::class.java)
-//    }
 
     private val service: RedditService by lazy {
         RedditService(
@@ -182,7 +159,7 @@ internal class RedditClientImpl(
 
     override suspend fun me(): Me {
         return call { service.me() }
-            .let { ApiMeConverter.convert(it) }
+            .let { org.jraf.klibreddit.internal.json.account.JsonMeConverter.convert(it) }
     }
 
 
@@ -196,7 +173,7 @@ internal class RedditClientImpl(
                 pagination.itemCount
             )
         }
-            .let { ApiPostListConverter.convert(it to pagination.itemCount) }
+            .let { JsonPostListConverter.convert(it to pagination.itemCount) }
     }
 
     private suspend fun subredditPostsOrdered(
@@ -215,7 +192,7 @@ internal class RedditClientImpl(
                 pagination.itemCount
             )
         }
-            .let { ApiPostListConverter.convert(it to pagination.itemCount) }
+            .let { JsonPostListConverter.convert(it to pagination.itemCount) }
     }
 
     override suspend fun hot(subreddit: String?, pagination: Pagination): Page<Post> {
@@ -252,7 +229,7 @@ internal class RedditClientImpl(
                 maxDepth
             )
         }
-            .let { ApiPostOrCommentOrMoreListConverter.convert(it) }
+            .let { JsonPostOrCommentOrMoreListConverter.convert(it) }
     }
 
     override suspend fun moreComments(postWithComments: PostWithComments): PostWithComments {
@@ -267,7 +244,7 @@ internal class RedditClientImpl(
         }
             .let {
                 val comments = postWithComments.comments.toMutableList()
-                comments += ApiJsonDataCommentOrMoreConverter.convert(it)
+                comments += JsonCommentOrMoreConverter.convert(it)
                 (postWithComments as PostWithCommentsImpl).copy(
                     post = postWithComments.post,
                     comments = comments,
@@ -288,7 +265,7 @@ internal class RedditClientImpl(
         }
             .let {
                 val replies = comment.replies.toMutableList()
-                replies += ApiJsonDataCommentOrMoreConverter.convert(it)
+                replies += JsonCommentOrMoreConverter.convert(it)
                 (comment as CommentImpl).copy(
                     replies = replies,
                     moreReplyIds = moreReplyIds[1]
@@ -302,5 +279,4 @@ internal class RedditClientImpl(
     override suspend fun comment(comment: Comment, text: String) {
         return call { service.comment(comment.name, text) }
     }
-
 }

@@ -27,31 +27,37 @@ package org.jraf.klibreddit.sample
 
 import org.apache.commons.text.WordUtils
 import org.jraf.klibreddit.client.RedditClient
-import org.jraf.klibreddit.model.client.ClientConfiguration
-import org.jraf.klibreddit.model.client.HttpConfiguration
-import org.jraf.klibreddit.model.client.HttpLoggingLevel
-import org.jraf.klibreddit.model.client.UserAgent
+import org.jraf.klibreddit.client.configuration.ClientConfiguration
+import org.jraf.klibreddit.client.configuration.HttpConfiguration
+import org.jraf.klibreddit.client.configuration.HttpLoggingLevel
+import org.jraf.klibreddit.client.configuration.UserAgent
 import org.jraf.klibreddit.model.listings.Comment
+import org.jraf.klibreddit.model.listings.FirstPage
+import org.jraf.klibreddit.model.listings.Pagination
 import org.jraf.klibreddit.model.listings.PostWithComments
-import org.jraf.klibreddit.model.oauth.OAuthConfiguration
-import java.util.Date
+import org.jraf.klibreddit.client.configuration.OAuthConfiguration
+import org.jraf.klibreddit.model.listings.Subreddits
+import org.slf4j.simple.SimpleLogger
 
 const val PLATFORM = "cli"
 const val APP_ID = "klibreddit-sample"
 const val VERSION = "1.0.0"
 const val AUTHOR_REDDIT_NAME = "klibreddit"
 
-// 0/ Follow the instructions here to declare your app and get the client id and redirect uri:
+// 0/ Follow the instructions here to declare your app and get the configuration id and redirect uri:
 // https://github.com/reddit-archive/reddit/wiki/OAuth2
-// Choose 'Installed App', and then copy/paste the client id and redirect URL to these constants
+// Choose 'Installed App', and then copy/paste the configuration id and redirect URL to these constants
 const val OAUTH_CLIENT_ID = "VpcPbMjFbdpWdsHPqB9lFA"
 const val OAUTH_REDIRECT_URI = "https://google.com"
 
 suspend fun main() {
     // Logging
-    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace")
+    System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE")
+    System.setProperty(SimpleLogger.LOG_FILE_KEY, "System.out")
+    System.setProperty(SimpleLogger.SHOW_DATE_TIME_KEY, "true")
+    System.setProperty(SimpleLogger.DATE_TIME_FORMAT_KEY, "yyyy-MM-dd HH:mm:ss")
 
-    // Create the client
+    // Create the configuration
     val client = RedditClient.newRedditClient(
         ClientConfiguration(
             UserAgent(PLATFORM, APP_ID, VERSION, AUTHOR_REDDIT_NAME),
@@ -60,7 +66,7 @@ suspend fun main() {
                 OAUTH_REDIRECT_URI
             ),
             HttpConfiguration(
-                loggingLevel = HttpLoggingLevel.BASIC,
+                loggingLevel = HttpLoggingLevel.ALL,
                 // This is only needed to debug with, e.g., Charles Proxy
 //                httpProxy = HttpProxy("localhost", 8888)
             )
@@ -72,12 +78,12 @@ suspend fun main() {
     // **********************************************************************************************
 
 //    // 1/ Display the authorize URL
-//    println(client.oAuth.getAuthorizeUrl(*OAuthScope.values()))
+//    println(configuration.oAuth.getAuthorizeUrl(*OAuthScope.values()))
 //
 //    // 2/ Go to the printed URL in your browser, and accept the authorization dialog
 //    // You will be redirected to a specific URL.
 //    // Copy and paste it to this call
-//    client.oAuth.onAuthorizeRedirect("https://www.google.com/?state=a0180c5a-fe72-4451-95fd-ac7253a7f2d5&code=yU5GrubQWwUNroPY66TsvSuygxhKbw#_")
+//    configuration.oAuth.onAuthorizeRedirect("https://www.google.com/?state=a0180c5a-fe72-4451-95fd-ac7253a7f2d5&code=yU5GrubQWwUNroPY66TsvSuygxhKbw#_")
 //        .subscribeBy { println("Your oauth refresh token is: $it") }
 
     // ************************************************************************
@@ -97,36 +103,36 @@ suspend fun main() {
 //    println(bestPostsFirstPage)
 //    val bestPostsSecondPage = client.listings.best(Pagination(bestPostsFirstPage.nextPageIndex!!, 2))
 //    println(bestPostsSecondPage)
-//
-//    // First page of /r/popular
-//    val popularFirstPage = client.listings.top(
-//        subreddit = Subreddits.POPULAR,
-//        pagination = Pagination(FirstPage, 4)
-//    )
-//    println(popularFirstPage)
-//
-//    // Second page of /r/popular
-//    val popularSecondPage = client.listings.top(
-//        subreddit = Subreddits.POPULAR,
-//        pagination = popularFirstPage.nextPagination!!
-//    )
-//    println(popularSecondPage)
-//
-//    // Comments of first post of second page of /r/popular
-//    val popularSecondPageComments = client.listings.comments(popularSecondPage.list.first().id)
-//    printComments(popularSecondPageComments.comments)
+
+    // First page of /r/popular
+    val popularFirstPage = client.listings.top(
+        subreddit = Subreddits.POPULAR,
+        pagination = Pagination(FirstPage, 4)
+    )
+    println(popularFirstPage)
+
+    // Second page of /r/popular
+    val popularSecondPage = client.listings.top(
+        subreddit = Subreddits.POPULAR,
+        pagination = popularFirstPage.nextPagination!!
+    )
+    println(popularSecondPage)
+
+    // Comments of first post of second page of /r/popular
+    val popularSecondPageComments = client.listings.comments(popularSecondPage.list.first().id)
+    printComments(popularSecondPageComments.comments)
 //
 //    // Get more comments
-//    val popularSecondPageMoreComments = client.listings.moreComments(popularSecondPageComments)
+//    val popularSecondPageMoreComments = configuration.listings.moreComments(popularSecondPageComments)
 //    println("*".repeat(72))
 //    printComments(popularSecondPageMoreComments.comments)
 //
 //
 //    // Retrieve a specific post with its comments
-//    val specificPostAndComments = client.listings.comments("8aqt03", itemCount = 10)
+//    val specificPostAndComments = configuration.listings.comments("8aqt03", itemCount = 10)
 //    printComments(specificPostAndComments.comments)
 //    // Get more comments
-//    val specificPostMoreComments = client.listings.moreComments(specificPostAndComments)
+//    val specificPostMoreComments = configuration.listings.moreComments(specificPostAndComments)
 //
 //    println("*".repeat(120))
 //    println()
@@ -135,25 +141,25 @@ suspend fun main() {
 //    val firstComment = specificPostMoreComments.comments.first()
 //    // Get more replies (if any) for the first comment
 //    if (firstComment.moreReplyIds.isNotEmpty()) {
-//        println(client.listings.moreComments(firstComment))
+//        println(configuration.listings.moreComments(firstComment))
 //    }
 
 
 //    // Recursively get ALL comments of a post
-//    val comments = client.listings.comments("8aqt03")
-//    val allCommentsRecursively = comments.allCommentsRecursively(client)
+//    val comments = configuration.listings.comments("8aqt03")
+//    val allCommentsRecursively = comments.allCommentsRecursively(configuration)
 //    printComments(allCommentsRecursively.comments)
 
-    // Get comments for a specific post
-    val comments2 = client.listings.comments("8aqt03")
-    printComments(comments2.comments)
-    // Find the last comment
-    val lastComment = comments2.comments.last()
-    println("*".repeat(72))
-    printComments(listOf(lastComment), false)
-
-    // Post a reply comment to it
-    client.linksAndComments.comment(lastComment, "This comment was posted on ${Date()}")
+//    // Get comments for a specific post
+//    val comments2 = configuration.listings.comments("8aqt03")
+//    printComments(comments2.comments)
+//    // Find the last comment
+//    val lastComment = comments2.comments.last()
+//    println("*".repeat(72))
+//    printComments(listOf(lastComment), false)
+//
+//    // Post a reply comment to it
+//    configuration.linksAndComments.comment(lastComment, "This comment was posted on ${Date()}")
 }
 
 private suspend fun PostWithComments.allCommentsRecursively(client: RedditClient): PostWithComments {
@@ -168,16 +174,16 @@ private suspend fun PostWithComments.allCommentsRecursively(client: RedditClient
 
 
 //
-//private fun allRepliesRecursively(client: RedditClient): (PostWithComments) -> Single<PostWithComments> {
+//private fun allRepliesRecursively(configuration: RedditClient): (PostWithComments) -> Single<PostWithComments> {
 //    return { postWithComments ->
 //        val comment = findFirstCommentThatHasMoreReplies(postWithComments.comments)
 //        if (comment == null) {
 //            Single.just(postWithComments)
 //        } else {
-//            client.listings.moreComments(comment)
+//            configuration.listings.moreComments(comment)
 //                .map { postWithComments.updateComment(it) }
 //                // Recurse
-//                .flatMap(allRepliesRecursively(client))
+//                .flatMap(allRepliesRecursively(configuration))
 //        }
 //    }
 //}

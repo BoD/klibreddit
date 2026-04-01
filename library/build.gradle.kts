@@ -25,9 +25,9 @@ dependencies {
     implementation(Ktor.client.auth)
     implementation(Ktor.client.logging)
     implementation(Ktor.plugins.serialization.kotlinx.json)
-    implementation(KotlinX.serialization.json)
-
     implementation(Ktor.client.okHttp)
+
+    implementation(KotlinX.serialization.json)
 
     // OkHttp
     implementation(Square.okHttp3.loggingInterceptor)

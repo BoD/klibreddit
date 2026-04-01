@@ -27,4 +27,4 @@ package org.jraf.klibreddit.internal.util
 
 import java.util.Locale
 
-internal val <E : Enum<E>> Enum<E>.nameLowerCase get() = name.toLowerCase(Locale.US)
+internal val <E : Enum<E>> Enum<E>.nameLowerCase get() = name.lowercase(Locale.US)

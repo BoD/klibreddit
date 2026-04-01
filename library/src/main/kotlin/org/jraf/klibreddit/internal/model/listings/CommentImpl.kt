@@ -62,7 +62,7 @@ internal data class CommentImpl(
     override val noFollow: Boolean,
     override val canModPost: Boolean,
     override val sendReplies: Boolean,
-    override val edited: Int?,
+    override val edited: Date?,
     override val collapsed: Boolean,
     override val isSubmitter: Boolean,
     override val stickied: Boolean,
